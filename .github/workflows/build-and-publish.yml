@@ -1,0 +1,98 @@
+name: build-and-publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Image tag to publish (e.g. latest)"
+        required: true
+        default: "latest"
+
+env:
+  IMAGE_REPO: kyuz0/vllm-therock-gfx1201
+  DOCKER_BUILDKIT: "1"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Put Docker on /mnt
+        run: |
+          set -eux
+          echo '{ "data-root": "/mnt/docker" }' | sudo tee /etc/docker/daemon.json
+          sudo systemctl stop docker
+          sudo rm -rf /var/lib/docker || true
+          sudo mkdir -p /mnt/docker
+          sudo systemctl start docker
+          docker info | grep "Docker Root Dir"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Free disk space
+        shell: bash
+        run: |
+          set -euxo pipefail
+          echo "Disk BEFORE:"; df -h
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc || true
+          sudo rm -rf /opt/hostedtoolcache/CodeQL /opt/hostedtoolcache/go || true
+          docker system prune -af || true
+          docker builder prune -af || true
+          sudo apt-get clean
+          sudo rm -rf /var/lib/apt/lists/*
+          sudo rm -rf /opt/hostedtoolcache
+          echo "Disk AFTER:"; df -h
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: BuildKit GC config (8GB cap)
+        run: |
+          cat > /tmp/buildkitd.toml <<'EOF'
+          [worker.oci]
+            gc = true
+            gckeepstorage = 8000   # MB
+          EOF
+
+      - name: Set up Buildx (with GC)
+        uses: docker/setup-buildx-action@v3
+        with:
+          buildkitd-flags: --config /tmp/buildkitd.toml
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: docker.io/${{ env.IMAGE_REPO }}
+          tags: |
+            type=raw,value=${{ github.event.inputs.tag }}
+            type=sha
+            type=raw,value={{date 'YYYYMMDD-HHmmss'}}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: false
+          sbom: false
+          no-cache: true
+
+      - name: Prune buildx cache
+        if: always()
+        run: |
+          docker buildx prune -af --verbose --min-free-space 4gb || true
