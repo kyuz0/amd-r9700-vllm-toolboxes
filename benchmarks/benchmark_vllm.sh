@@ -36,6 +36,11 @@ for model in "${MODELS[@]}"; do
         
         log_file="$LOG_DIR/${model_name}_${scenario_name}.log"
         
+        if [ -f "$log_file" ]; then
+            echo "    SKIPPING: Result file $log_file already exists."
+            continue
+        fi
+
         # Run vLLM benchmark
         # We use --trust-remote-code as some new models might require it
         # We capture both stdout and stderr to the log file
