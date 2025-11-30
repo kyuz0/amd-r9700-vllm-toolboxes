@@ -1,0 +1,23 @@
+[
+  {
+    "model": "DeepSeek-R1-Distill-Qwen-1.5B",
+    "scenario": "Long Context (2048/128)",
+    "throughput_tokens_per_sec": 45.67,
+    "requests_per_sec": 4.56,
+    "filename": "DeepSeek-R1-Distill-Qwen-1.5B_long_context.log"
+  },
+  {
+    "model": "DeepSeek-R1-Distill-Qwen-1.5B",
+    "scenario": "Standard (512/128)",
+    "throughput_tokens_per_sec": 123.45,
+    "requests_per_sec": 12.34,
+    "filename": "DeepSeek-R1-Distill-Qwen-1.5B_standard.log"
+  },
+  {
+    "model": "Qwen2.5-7B-Instruct",
+    "scenario": "Throughput (128/128)",
+    "throughput_tokens_per_sec": 200.0,
+    "requests_per_sec": 20.0,
+    "filename": "Qwen2.5-7B-Instruct_throughput.log"
+  }
+]
