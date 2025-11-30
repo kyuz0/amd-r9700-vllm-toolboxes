@@ -25,7 +25,7 @@ def parse_log_file(file_path):
     # Everything before the scenario name is the model name
     scenario_map = {
         'standard': 'Standard (512/128)',
-        'long': 'Long Context (2048/128)', # 'long_context' splits to 'long', 'context'
+        'long': 'Long Context (16384/128)', # 'long_context' splits to 'long', 'context'
         'throughput': 'Throughput (128/128)'
     }
     

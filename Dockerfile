@@ -76,7 +76,31 @@ RUN git clone https://github.com/ROCm/flash-attention.git &&\
 RUN git clone https://github.com/vllm-project/vllm.git /opt/vllm
 WORKDIR /opt/vllm
 
-
+# --- PATCHING ---
+# vLLM relies on 'amdsmi' to detect AMD GPUs. If it's missing or fails (common in containers),
+# vLLM falls back to CPU. We patch it to force ROCm detection.
+RUN echo "import sys, re" > patch_vllm.py && \
+  echo "from pathlib import Path" >> patch_vllm.py && \
+  # Patch 1: __init__.py - Force is_rocm=True and bypass amdsmi checks
+  echo "p = Path('vllm/platforms/__init__.py')" >> patch_vllm.py && \
+  echo "txt = p.read_text()" >> patch_vllm.py && \
+  echo "txt = txt.replace('import amdsmi', '# import amdsmi')" >> patch_vllm.py && \
+  echo "txt = re.sub(r'is_rocm = .*', 'is_rocm = True', txt)" >> patch_vllm.py && \
+  echo "txt = re.sub(r'if len\(amdsmi\.amdsmi_get_processor_handles\(\)\) > 0:', 'if True:', txt)" >> patch_vllm.py && \
+  echo "txt = txt.replace('amdsmi.amdsmi_init()', 'pass')" >> patch_vllm.py && \
+  echo "txt = txt.replace('amdsmi.amdsmi_shut_down()', 'pass')" >> patch_vllm.py && \
+  echo "p.write_text(txt)" >> patch_vllm.py && \
+  # Patch 2: rocm.py - Mock amdsmi and force device name
+  echo "p = Path('vllm/platforms/rocm.py')" >> patch_vllm.py && \
+  echo "txt = p.read_text()" >> patch_vllm.py && \
+  echo "header = 'import sys\nfrom unittest.mock import MagicMock\nsys.modules[\"amdsmi\"] = MagicMock()\n'" >> patch_vllm.py && \
+  echo "txt = header + txt" >> patch_vllm.py && \
+  echo "txt = re.sub(r'device_type = .*', 'device_type = \"rocm\"', txt)" >> patch_vllm.py && \
+  echo "txt = re.sub(r'device_name = .*', 'device_name = \"gfx1201\"', txt)" >> patch_vllm.py && \
+  echo "txt += '\n    def get_device_name(self, device_id: int = 0) -> str:\n        return \"AMD-gfx1201\"\n'" >> patch_vllm.py && \
+  echo "p.write_text(txt)" >> patch_vllm.py && \
+  echo "print('Successfully patched vLLM for R9700')" >> patch_vllm.py && \
+  python patch_vllm.py
 
 # 7. Build vLLM (Wheel Method) with CLANG Host Compiler
 RUN python -m pip install --upgrade cmake ninja packaging wheel numpy "setuptools-scm>=8" "setuptools<80.0.0" scikit-build-core pybind11

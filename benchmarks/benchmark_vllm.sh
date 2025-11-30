@@ -14,7 +14,7 @@ MODELS=(
 # Format: "name:input_len:output_len"
 SCENARIOS=(
     "standard:512:128"
-    "long_context:2048:128"
+    "long_context:16384:128"
     "throughput:128:128"
 )
 
