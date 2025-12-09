@@ -106,15 +106,15 @@ select_model() {
             read -rsn2 key
             case "$key" in
                 '[A') # UP
-                    ((selected--))
+                    ((selected--)) || true
                     [[ $selected -lt 0 ]] && selected=$(( ${#MODELS[@]} - 1 ))
                     ;;
                 '[B') # DOWN
-                    ((selected++))
+                    ((selected++)) || true
                     [[ $selected -ge ${#MODELS[@]} ]] && selected=0
                     ;;
             esac
-        elif [[ "$key" == "" ]]; then
+        elif [[ "$key" == "" || "$key" == $'\n' ]]; then
             break # ENTER
         elif [[ "$key" == "q" || "$key" == "Q" ]]; then
             clear_screen; exit 0
@@ -157,25 +157,25 @@ configure_launch() {
             echo -e "${prefix}${opts[$i]}"
         done
         
-        echo -e "\n ${DIM}[UP/DOWN] Navigate, [LEFT/RIGHT] Change Value, [ENTER] Confirm${N}"
+        echo -e "\n ${DIM}[UP/DOWN] Navigate, [LEFT/RIGHT] Change Value, [ENTER] to Launch${N}"
         
         read -rsn1 key
         if [[ "$key" == $'\x1b' ]]; then
             read -rsn2 key
             case "$key" in
                 '[A') # UP
-                    ((selected_setting--))
+                    ((selected_setting--)) || true
                     [[ $selected_setting -lt 0 ]] && selected_setting=3
                     ;;
                 '[B') # DOWN
-                    ((selected_setting++))
+                    ((selected_setting++)) || true
                     [[ $selected_setting -gt 3 ]] && selected_setting=0
                     ;;
                 '[C') # RIGHT
                     if [[ "$selected_setting" -eq 0 ]]; then
                         # Toggle TP
                         if [[ "$current_tp" -lt "$max_tp" && "$current_tp" -lt "$GPU_COUNT" ]]; then
-                             ((current_tp++))
+                             ((current_tp++)) || true
                         fi
                     fi
                     ;;
@@ -183,15 +183,16 @@ configure_launch() {
                      if [[ "$selected_setting" -eq 0 ]]; then
                         # Toggle TP
                         if [[ "$current_tp" -gt 1 ]]; then
-                             ((current_tp--))
+                             ((current_tp--)) || true
                         fi
                     fi
                     ;;
             esac
-        elif [[ "$key" == "" ]]; then
-            if [[ "$selected_setting" -eq 3 ]]; then
-                break # Launch
-            fi
+                    fi
+                    ;;
+            esac
+        elif [[ "$key" == "" || "$key" == $'\n' ]]; then
+            break # Launch on ENTER from anywhere
         fi
     done
     

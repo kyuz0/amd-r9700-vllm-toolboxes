@@ -6,14 +6,10 @@ from pathlib import Path
 # ⚙️ GLOBAL SETTINGS
 # =========================
 
-# HARDWARE: 2x AMD Radeon AI PRO R9700 (32GB, RDNA 4)
+# HARDWARE: NVIDIA GPUs (Auto-detected)
 GPU_UTIL = "0.98" 
 PORT     = 8000
 HOST     = "127.0.0.1"
-
-# BENCHMARK TOGGLES
-# AITER is disabled/removed.
- 
 
 # 1. THROUGHPUT CONFIG
 OFF_NUM_PROMPTS      = 1000 
@@ -29,7 +25,7 @@ QPS_SWEEP       = [1.0, 4.0]
 FALLBACK_INPUT_LEN  = 1024
 FALLBACK_OUTPUT_LEN = 512
 
-RESULTS_DIR = Path("benchmark_results")
+RESULTS_DIR = Path("benchmark_results_nvidia")
 RESULTS_DIR.mkdir(exist_ok=True)
 
 # =========================
@@ -38,7 +34,6 @@ RESULTS_DIR.mkdir(exist_ok=True)
 
 MODEL_TABLE = {
     # 1. Llama 3.1 8B Instruct
-    # MAD uses 131k tokens. We scale to 32k for 32GB VRAM safety.
     "meta-llama/Meta-Llama-3.1-8B-Instruct": {
         "ctx": "65536",  
         "trust_remote": False,
@@ -48,7 +43,6 @@ MODEL_TABLE = {
     },
     
     # 2. GPT-OSS 20B (MXFP4)
-    # MAD Row 0 uses 8192. We match this exactly.
     "openai/gpt-oss-20b": {
         "ctx": "32768", 
         "trust_remote": True,
@@ -58,7 +52,6 @@ MODEL_TABLE = {
     },
 
     # 3. Qwen 14B FP8
-    # MAD uses 40k. We use 32k.
     "RedHatAI/Qwen3-14B-FP8-dynamic": {
         "ctx": "32768", 
         "trust_remote": True,
@@ -76,17 +69,13 @@ MODEL_TABLE = {
         "max_tokens": "32768"
     },
 
-    # 5. Qwen 80B AWQ (The Big One) [NEW]
-    # Size: ~48GB. Fits on 2x32GB (64GB). Leftover for Cache: ~16GB.
-    # Config: 20k ctx fits in that cache. Eager mode required for stability.
+    # 5. Qwen 80B AWQ
     "cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit": {
         "ctx": "20480", 
         "trust_remote": True,
-        "valid_tp": [2], # Too big for single GPU
-        "max_num_seqs": "32", # Lower concurrency for safety
-        "max_tokens": "16384", # Lower batch size because Eager mode is CPU intensive
-        "enforce_eager": True, # Fixes Graph Capture crash
-        "env": {"VLLM_USE_TRITON_AWQ": "1"} # Fixes "Unsupported Hardware" error
+        "valid_tp": [2], # Requires 2 GPUs
+        "max_num_seqs": "32", 
+        "max_tokens": "16384",
     },
 }
 
@@ -106,18 +95,17 @@ def log(msg): print(f"\n[BENCH] {msg}")
 
 def get_gpu_count():
     try:
-        # Using rocm-smi --showid to list GPUs. 
-        # Output format: "GPU[0] : 0x..."
-        res = subprocess.run(["rocm-smi", "--showid"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        # Using nvidia-smi -L to list GPUs
+        res = subprocess.run(["nvidia-smi", "-L"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if res.returncode == 0:
-            count = len([line for line in res.stdout.strip().split('\n') if "GPU" in line])
-            return count if count > 0 else 1
+            count = len([line for line in res.stdout.strip().split('\n') if line.strip()])
+            return count
         else:
-            log("rocm-smi failed, defaulting to 2 GPUs (Hardcoded Fallback)")
-            return 2
+            log("nvidia-smi failed, defaulting to 1 GPU")
+            return 1
     except Exception as e:
-        log(f"Error detecting GPUs: {e}, defaulting to 2 GPUs")
-        return 2
+        log(f"Error detecting GPUs: {e}, defaulting to 1 GPU")
+        return 1
 
 def kill_vllm():
     subprocess.run("pgrep -f 'vllm serve' | xargs -r kill -9", 
@@ -177,7 +165,6 @@ def get_model_args(model, tp_size):
     ]
     
     if config.get("trust_remote"): cmd.append("--trust-remote-code")
-    if config.get("enforce_eager"): cmd.append("--enforce-eager")
     
     return cmd
 
@@ -194,7 +181,6 @@ def run_throughput(model, tp_size):
     dataset_path = get_dataset()
     dataset_args = ["--dataset-name", "sharegpt", "--dataset-path", dataset_path] if dataset_path else ["--input-len", "1024"]
     
-    # Retrieve Model-Specific Batch Tokens
     batch_tokens = MODEL_TABLE[model].get("max_tokens", DEFAULT_BATCH_TOKENS)
 
     log(f"START Throughput {model} (TP={tp_size}) [Batch: {batch_tokens}]...")
@@ -211,10 +197,7 @@ def run_throughput(model, tp_size):
     ])
     cmd.extend(dataset_args)
 
-    # ENV Setup: Global + Model Specific
     env = os.environ.copy()
-    
-    # Inject model specific env vars (e.g. for AWQ)
     model_env = MODEL_TABLE[model].get("env", {})
     env.update(model_env)
 
@@ -238,9 +221,7 @@ def run_latency(model, tp_size):
     srv_log = open(RESULTS_DIR / f"{model_safe}_tp{tp_size}_server.log", "w")
     srv_args = [x for x in get_model_args(model, tp_size) if x != "--model" and x != model]
     
-    # ENV Setup: Global + Model Specific
     env = os.environ.copy()
-
     model_env = MODEL_TABLE[model].get("env", {})
     env.update(model_env)
 
@@ -311,7 +292,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     gpu_count = get_gpu_count()
-    log(f"Detected {gpu_count} AMD GPU(s)")
+    log(f"Detected {gpu_count} GPU(s)")
     
     valid_tp_args = [t for t in args.tp if t <= gpu_count]
     if not valid_tp_args:
