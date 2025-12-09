@@ -61,9 +61,16 @@ RUN python -m pip install \
   --index-url https://rocm.nightlies.amd.com/v2-staging/gfx120X-all/ \
   --pre torch torchaudio torchvision
 
+# --- bitsandbytes (ROCm) ---
 WORKDIR /opt
+RUN git clone -b rocm_enabled_multi_backend https://github.com/ROCm/bitsandbytes.git
+WORKDIR /opt/bitsandbytes
+RUN cmake -S . -DGPU_TARGETS="gfx1151" -DBNB_ROCM_ARCH="gfx1151" -DCOMPUTE_BACKEND=hip && \
+  make -j && \
+  python -m pip install --no-cache-dir . --no-build-isolation --no-deps
 
 # Flash-Attention
+WORKDIR /opt
 ENV FLASH_ATTENTION_TRITON_AMD_ENABLE="TRUE"
 
 RUN git clone https://github.com/ROCm/flash-attention.git &&\ 
@@ -132,7 +139,7 @@ RUN chmod -R a+rwX /opt && \
   rm -rf /root/.cache/pip || true && \
   dnf clean all && rm -rf /var/cache/dnf/*
 
-COPY scripts/01-rocm-env-for-triton.sh /etc/profile.d/01-rocm-env-for-triton.sh
+COPY scripts/01-rocm-envs.sh /etc/profile.d/01-rocm-envs.sh
 COPY scripts/99-toolbox-banner.sh /etc/profile.d/99-toolbox-banner.sh
 COPY scripts/zz-venv-last.sh /etc/profile.d/zz-venv-last.sh
 RUN chmod 0644 /etc/profile.d/*.sh
