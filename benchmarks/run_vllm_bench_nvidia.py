@@ -67,7 +67,8 @@ MODEL_TABLE = {
         "trust_remote": True,
         "valid_tp": [1, 2],
         "max_num_seqs": "64",
-        "max_tokens": "32768"
+        "max_tokens": "32768",
+        "gpu_util": "0.90"
     },
 
     # 5. Qwen 80B AWQ
@@ -193,9 +194,11 @@ def wait_for_server(url, process, timeout=600):
 def get_model_args(model, tp_size):
     config = MODEL_TABLE.get(model, {"ctx": "8192", "max_num_seqs": "32"})
     
+    util = config.get("gpu_util", GPU_UTIL)
+    
     cmd = [
         "--model", model,
-        "--gpu-memory-utilization", config.get("gpu_util", GPU_UTIL),
+        "--gpu-memory-utilization", util,
         "--max-model-len", config["ctx"], 
         "--dtype", "auto",
         "--tensor-parallel-size", str(tp_size),
