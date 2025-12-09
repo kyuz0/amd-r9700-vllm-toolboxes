@@ -4,15 +4,15 @@
 set -euo pipefail
 
 # --- Colors & Styles ---
-R='\033[0;31m'
-G='\033[0;32m'
-Y='\033[1;33m'
-B='\033[0;34m'
-C='\033[0;36m'
-W='\033[1;37m'
-N='\033[0m'
-DIM='\033[2m'
-BOLD='\033[1m'
+R=$'\e[0;31m'
+G=$'\e[0;32m'
+Y=$'\e[1;33m'
+B=$'\e[0;34m'
+C=$'\e[0;36m'
+W=$'\e[1;37m'
+N=$'\e[0m'
+DIM=$'\e[2m'
+BOLD=$'\e[1m'
 
 # --- Configuration ---
 HOST="${HOST:-0.0.0.0}"
@@ -31,8 +31,8 @@ MODELS=(
 )
 
 # --- Helpers ---
-clear_screen() { printf "\033c"; }
-cursor_to() { printf "\033[%s;%sH"    "$1" "$2"; }
+clear_screen() { printf "\e[H\e[2J"; }
+cursor_to() { printf "\e[%s;%sH" "$1" "$2"; }
 print_bar() { printf "${DIM}%*s${N}\n" "${COLUMNS:-$(tput cols)}" '' | tr ' ' '-'; }
 center() { 
     local text="$1"
@@ -101,9 +101,9 @@ select_model() {
         echo -e "\n ${DIM}Use [UP/DOWN] to navigate, [ENTER] to select, [Q] to quit${N}"
         
         # Input loop
-        read -bsn1 key
+        read -rsn1 key
         if [[ "$key" == $'\x1b' ]]; then
-            read -bsn2 key
+            read -rsn2 key
             case "$key" in
                 '[A') # UP
                     ((selected--))
@@ -159,9 +159,9 @@ configure_launch() {
         
         echo -e "\n ${DIM}[UP/DOWN] Navigate, [LEFT/RIGHT] Change Value, [ENTER] Confirm${N}"
         
-        read -bsn1 key
+        read -rsn1 key
         if [[ "$key" == $'\x1b' ]]; then
-            read -bsn2 key
+            read -rsn2 key
             case "$key" in
                 '[A') # UP
                     ((selected_setting--))

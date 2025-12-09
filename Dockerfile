@@ -154,7 +154,8 @@ RUN chmod -R a+rwX /opt && \
 COPY scripts/01-rocm-envs.sh /etc/profile.d/01-rocm-envs.sh
 COPY scripts/99-toolbox-banner.sh /etc/profile.d/99-toolbox-banner.sh
 COPY scripts/zz-venv-last.sh /etc/profile.d/zz-venv-last.sh
-RUN chmod 0644 /etc/profile.d/*.sh
+COPY scripts/start-vllm.sh /usr/local/bin/start-vllm
+RUN chmod 0644 /etc/profile.d/*.sh && chmod +x /usr/local/bin/start-vllm
 RUN printf 'ulimit -S -c 0\n' > /etc/profile.d/90-nocoredump.sh && chmod 0644 /etc/profile.d/90-nocoredump.sh
 
 CMD ["/bin/bash"]
