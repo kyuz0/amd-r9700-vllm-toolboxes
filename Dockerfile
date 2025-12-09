@@ -61,14 +61,6 @@ RUN python -m pip install \
   --index-url https://rocm.nightlies.amd.com/v2-staging/gfx120X-all/ \
   --pre torch torchaudio torchvision
 
-# --- bitsandbytes (ROCm) ---
-WORKDIR /opt
-RUN git clone -b rocm_enabled_multi_backend https://github.com/ROCm/bitsandbytes.git
-WORKDIR /opt/bitsandbytes
-RUN cmake -S . -DGPU_TARGETS="gfx1201" -DBNB_ROCM_ARCH="gfx1201" -DCOMPUTE_BACKEND=hip && \
-  make -j && \
-  python -m pip install --no-cache-dir . --no-build-isolation --no-deps
-
 # Flash-Attention
 WORKDIR /opt
 ENV FLASH_ATTENTION_TRITON_AMD_ENABLE="TRUE"
@@ -130,6 +122,14 @@ RUN export HIP_DEVICE_LIB_PATH=$(find /opt/rocm -type d -name bitcode -print -qu
   export CMAKE_ARGS="-DROCM_PATH=/opt/rocm -DHIP_PATH=/opt/rocm -DAMDGPU_TARGETS=gfx1201 -DHIP_ARCHITECTURES=gfx1201" && \   
   python -m pip wheel --no-build-isolation --no-deps -w /tmp/dist -v . && \
   python -m pip install /tmp/dist/*.whl
+
+# --- bitsandbytes (ROCm) ---
+WORKDIR /opt
+RUN git clone -b rocm_enabled_multi_backend https://github.com/ROCm/bitsandbytes.git
+WORKDIR /opt/bitsandbytes
+RUN cmake -S . -DGPU_TARGETS="gfx1201" -DBNB_ROCM_ARCH="gfx1201" -DCOMPUTE_BACKEND=hip && \
+  make -j && \
+  python -m pip install --no-cache-dir . --no-build-isolation --no-deps
 
 # 8. Final Cleanup & Runtime
 WORKDIR /opt
