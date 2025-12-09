@@ -191,15 +191,38 @@ def wait_for_server(url, process, timeout=600):
         time.sleep(2)
     return False
 
+# =========================
+# HARDWARE DETECTION (24GB vs 32GB)
+# =========================
+def is_24gb_card():
+    try:
+        res = subprocess.run(["nvidia-smi", "--query-gpu=memory.total", "--format=csv,noheader,nounits"], 
+                             capture_output=True, text=True)
+        # Check first GPU memory
+        mem = int(res.stdout.strip().split('\n')[0])
+        return mem < 28000 # 4090 is ~24576
+    except:
+        return False
+
+IS_24GB = is_24gb_card()
+if IS_24GB: log("Detected 24GB GPU class (e.g. RTX 4090). Applying memory overrides.")
+else: log("Detected 32GB+ GPU class. Using standard config.")
+
 def get_model_args(model, tp_size):
     config = MODEL_TABLE.get(model, {"ctx": "8192", "max_num_seqs": "32"})
+    
+    # --- DYNAMIC OVERRIDES ---
+    current_ctx = config["ctx"]
+    if IS_24GB and model == "meta-llama/Meta-Llama-3.1-8B-Instruct":
+        current_ctx = "31800"
+        log(f"Override: Llama 8B ctx reduced to {current_ctx} for 24GB VRAM")
     
     util = config.get("gpu_util", GPU_UTIL)
     
     cmd = [
         "--model", model,
         "--gpu-memory-utilization", util,
-        "--max-model-len", config["ctx"], 
+        "--max-model-len", current_ctx, 
         "--dtype", "auto",
         "--tensor-parallel-size", str(tp_size),
         "--max-num-seqs", config["max_num_seqs"]
