@@ -57,7 +57,8 @@ MODEL_TABLE = {
         "trust_remote": True,
         "valid_tp": [1],
         "max_num_seqs": "64",
-        "max_tokens": "32768"
+        "max_tokens": "32768",
+        "gpu_util": "0.90"
     },
 
     # 4. Qwen 30B 4-bit
@@ -112,13 +113,24 @@ def force_gpu_cleanup():
     max_retries = 10
     
     for i in range(max_retries):
-        # 1. Kill matching processes
+        # 1. Kill matching processes via name
         subprocess.run("pkill -9 -f 'vllm'", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        subprocess.run("pkill -9 -f 'multiprocessing'", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) # NVIDIA often spawns these
         
+        # 2. Kill processes via nvidia-smi (Driver reported)
+        try:
+            proc_res = subprocess.run(
+                ["nvidia-smi", "--query-compute-apps=pid", "--format=csv,noheader"],
+                capture_output=True, text=True
+            )
+            pids = [p.strip() for p in proc_res.stdout.split('\n') if p.strip()]
+            if pids:
+                log(f"Found lingering GPU processes via nvidia-smi: {pids}. Killing...")
+                subprocess.run(f"kill -9 {' '.join(pids)}", shell=True, stderr=subprocess.DEVNULL)
+        except: pass
+
         time.sleep(2)
 
-        # 2. Check actual VRAM usage via nvidia-smi
+        # 3. Check actual VRAM usage via nvidia-smi
         try:
             res = subprocess.run(
                 ["nvidia-smi", "--query-gpu=memory.used", "--format=csv,noheader,nounits"], 
@@ -183,7 +195,7 @@ def get_model_args(model, tp_size):
     
     cmd = [
         "--model", model,
-        "--gpu-memory-utilization", GPU_UTIL,
+        "--gpu-memory-utilization", config.get("gpu_util", GPU_UTIL),
         "--max-model-len", config["ctx"], 
         "--dtype", "auto",
         "--tensor-parallel-size", str(tp_size),
