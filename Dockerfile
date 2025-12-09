@@ -65,7 +65,7 @@ RUN python -m pip install \
 WORKDIR /opt
 RUN git clone -b rocm_enabled_multi_backend https://github.com/ROCm/bitsandbytes.git
 WORKDIR /opt/bitsandbytes
-RUN cmake -S . -DGPU_TARGETS="gfx1151" -DBNB_ROCM_ARCH="gfx1151" -DCOMPUTE_BACKEND=hip && \
+RUN cmake -S . -DGPU_TARGETS="gfx1201" -DBNB_ROCM_ARCH="gfx1201" -DCOMPUTE_BACKEND=hip && \
   make -j && \
   python -m pip install --no-cache-dir . --no-build-isolation --no-deps
 
@@ -119,7 +119,7 @@ ENV HIP_ARCHITECTURES="gfx1201"
 ENV AMDGPU_TARGETS="gfx1201"              
 ENV MAX_JOBS="4"
 
-# --- CRITICAL FIX FOR SEGFAULT ---
+# --- FIX FOR SEGFAULT ---
 # We force the Host Compiler (CC/CXX) to be the ROCm Clang, not Fedora GCC.
 # This aligns the ABI of the compiled vLLM extensions with PyTorch.
 ENV CC="/opt/rocm/llvm/bin/clang"
