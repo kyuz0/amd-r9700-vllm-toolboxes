@@ -98,9 +98,9 @@ printf 'GPU    : %s\n\n' "$GPU"
 printf 'Repo   : https://github.com/kyuz0/amd-r9700-vllm-toolboxes\n'
 printf 'Image  : docker.io/kyuz0/vllm-therock-gfx1201:latest\n\n'
 printf 'Included:\n'
-printf '  - %-16s → %s\n' "start-vllm (wizard)" "Beginner-friendly launcher that guides you through model & settings"
-printf '  - %-16s → %s\n' "vLLM server" "vllm serve Qwen/Qwen2.5-7B-Instruct"
-printf '  - %-16s → %s\n' "API test"    "curl localhost:8000/v1/chat/completions (see README)"
+printf '  - %-16s → %s\n' "start-vllm (TUI)" "Interactive launcher: Model select, Multi-GPU & Cache handling"
+printf '  - %-16s → %s\n' "vLLM server" "vllm serve meta-llama/Meta-Llama-3.1-8B-Instruct"
+printf '  - %-16s → %s\n' "API test"    "curl localhost:8000/v1/chat/completions"
 echo
 printf 'SSH tip: ssh -L 8000:localhost:8000 user@host\n\n'
 
