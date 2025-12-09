@@ -127,8 +127,20 @@ RUN export HIP_DEVICE_LIB_PATH=$(find /opt/rocm -type d -name bitcode -print -qu
 WORKDIR /opt
 RUN git clone -b rocm_enabled_multi_backend https://github.com/ROCm/bitsandbytes.git
 WORKDIR /opt/bitsandbytes
-RUN cmake -S . -DGPU_TARGETS="gfx1201" -DBNB_ROCM_ARCH="gfx1201" -DCOMPUTE_BACKEND=hip && \
-  make -j && \
+
+# Explicitly set HIP_PLATFORM (Docker ENV, not /etc/profile)
+ENV HIP_PLATFORM="amd"
+ENV CMAKE_PREFIX_PATH="/opt/rocm"
+
+# Force CMake to use the System ROCm Compiler (/opt/rocm/llvm/bin/clang++)
+RUN cmake -S . \
+  -DGPU_TARGETS="gfx1201" \
+  -DBNB_ROCM_ARCH="gfx1201" \
+  -DCOMPUTE_BACKEND=hip \
+  -DCMAKE_HIP_COMPILER=/opt/rocm/llvm/bin/clang++ \
+  -DCMAKE_CXX_COMPILER=/opt/rocm/llvm/bin/clang++ \
+  && \
+  make -j$(nproc) && \
   python -m pip install --no-cache-dir . --no-build-isolation --no-deps
 
 # 8. Final Cleanup & Runtime
