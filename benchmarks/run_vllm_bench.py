@@ -107,10 +107,16 @@ def log(msg): print(f"\n[BENCH] {msg}")
 def get_gpu_count():
     try:
         # Using rocm-smi --showid to list GPUs. 
-        # Output format: "GPU[0] : 0x..."
+        # Output format: "GPU[0] : Device Name: ..."
         res = subprocess.run(["rocm-smi", "--showid"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if res.returncode == 0:
-            count = len([line for line in res.stdout.strip().split('\n') if "GPU" in line])
+            # Filter specifically for the target GPU as requested
+            target_gpu = "AMD Radeon AI PRO R9700"
+            count = 0
+            for line in res.stdout.strip().split('\n'):
+                if "Device Name" in line and target_gpu in line:
+                    count += 1
+            
             return count if count > 0 else 1
         else:
             log("rocm-smi failed, defaulting to 2 GPUs (Hardcoded Fallback)")

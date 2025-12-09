@@ -7,7 +7,7 @@ from pathlib import Path
 # =========================
 
 # HARDWARE: NVIDIA GPUs (Auto-detected)
-GPU_UTIL = "0.98" 
+GPU_UTIL = "0.95" 
 PORT     = 8000
 HOST     = "127.0.0.1"
 
@@ -48,7 +48,7 @@ MODEL_TABLE = {
         "trust_remote": True,
         "valid_tp": [1, 2],
         "max_num_seqs": "64",
-        "max_tokens": "8192"
+        "max_tokens": "8192",
     },
 
     # 3. Qwen 14B FP8
@@ -107,10 +107,36 @@ def get_gpu_count():
         log(f"Error detecting GPUs: {e}, defaulting to 1 GPU")
         return 1
 
-def kill_vllm():
-    subprocess.run("pgrep -f 'vllm serve' | xargs -r kill -9", 
-                   shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    time.sleep(5)
+def force_gpu_cleanup():
+    """Aggressively kill processes and WAIT until VRAM is actually free."""
+    max_retries = 10
+    
+    for i in range(max_retries):
+        # 1. Kill matching processes
+        subprocess.run("pkill -9 -f 'vllm'", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run("pkill -9 -f 'multiprocessing'", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) # NVIDIA often spawns these
+        
+        time.sleep(2)
+
+        # 2. Check actual VRAM usage via nvidia-smi
+        try:
+            res = subprocess.run(
+                ["nvidia-smi", "--query-gpu=memory.used", "--format=csv,noheader,nounits"], 
+                capture_output=True, text=True
+            )
+            # Sum memory of all GPUs
+            used_mem = sum(int(x) for x in res.stdout.strip().split('\n') if x.strip())
+            
+            if used_mem < 1000: # If less than 1GB used, we are safe
+                if i > 0: log(f"GPU Cleaned after retry {i}. Usage: {used_mem} MiB")
+                return
+            
+            log(f"Waiting for GPU cleanup... ({used_mem} MiB still used)")
+        except Exception:
+            # If nvidia-smi fails, we just wait a bit and hope
+            time.sleep(2)
+            
+    log("WARNING: GPU validation timed out. Proceeding anyway (risk of OOM).")
 
 def nuke_vllm_cache():
     cache = Path.home() / ".cache" / "vllm"
@@ -165,6 +191,7 @@ def get_model_args(model, tp_size):
     ]
     
     if config.get("trust_remote"): cmd.append("--trust-remote-code")
+    if config.get("enforce_eager"): cmd.append("--enforce-eager")
     
     return cmd
 
@@ -184,7 +211,7 @@ def run_throughput(model, tp_size):
     batch_tokens = MODEL_TABLE[model].get("max_tokens", DEFAULT_BATCH_TOKENS)
 
     log(f"START Throughput {model} (TP={tp_size}) [Batch: {batch_tokens}]...")
-    kill_vllm()
+    force_gpu_cleanup()
     nuke_vllm_cache()
 
     cmd = ["vllm", "bench", "throughput"] + get_model_args(model, tp_size)
@@ -198,8 +225,12 @@ def run_throughput(model, tp_size):
     cmd.extend(dataset_args)
 
     env = os.environ.copy()
+    env["PYTORCH_ALLOC_CONF"] = "expandable_segments:True"
     model_env = MODEL_TABLE[model].get("env", {})
     env.update(model_env)
+
+    ids_cmd = " ".join(cmd)
+    log(f"CMD: {ids_cmd}")
 
     try: 
         subprocess.run(cmd, check=True, env=env)
@@ -215,18 +246,27 @@ def run_latency(model, tp_size):
 
     dataset_path = get_dataset()
     log(f"START Server {model} (TP={tp_size})...")
-    kill_vllm()
+    force_gpu_cleanup()
     nuke_vllm_cache()
 
+
     srv_log = open(RESULTS_DIR / f"{model_safe}_tp{tp_size}_server.log", "w")
-    srv_args = [x for x in get_model_args(model, tp_size) if x != "--model" and x != model]
+    
+    # Use get_model_args directly. It includes ["--model", model, ...]
+    srv_args = get_model_args(model, tp_size) 
     
     env = os.environ.copy()
+    env["PYTORCH_ALLOC_CONF"] = "expandable_segments:True"
     model_env = MODEL_TABLE[model].get("env", {})
     env.update(model_env)
 
-    proc = subprocess.Popen(["vllm", "serve", model] + srv_args + ["--host", HOST, "--port", str(PORT)], 
-                            stdout=srv_log, stderr=srv_log, env=env)
+    # Command: vllm serve --model <model> ... (no positional model arg)
+    cmd = ["vllm", "serve"] + srv_args + ["--host", HOST, "--port", str(PORT)]
+    
+    ids_cmd = " ".join(cmd)
+    log(f"CMD: {ids_cmd}")
+
+    proc = subprocess.Popen(cmd, stdout=srv_log, stderr=srv_log, env=env)
 
     try:
         if not wait_for_server(f"http://{HOST}:{PORT}", proc): return
@@ -255,7 +295,7 @@ def run_latency(model, tp_size):
     except Exception as e: log(f"CRASH: {e}")
     finally:
         proc.terminate()
-        kill_vllm()
+        force_gpu_cleanup()
 
 def print_summary(tps):
     print(f"\n{'MODEL':<40} | {'TP':<2} | {'TOK/S':<8} | {'QPS':<4} | {'TTFT':<6} | {'TPOT':<6}")
@@ -299,7 +339,7 @@ if __name__ == "__main__":
         log(f"Requested TP={args.tp} but only {gpu_count} GPU(s) detected. Nothing to run.")
         sys.exit(0)
 
-    kill_vllm()
+    force_gpu_cleanup()
     for tp in valid_tp_args:
         for m in MODELS_TO_RUN:
             run_throughput(m, tp)
