@@ -79,6 +79,15 @@ MODEL_TABLE = {
         "max_num_seqs": "32", 
         "max_tokens": "16384",
     },
+
+    # 6. Llama 3.1 8B FP8
+    "RedHatAI/Llama-3.1-8B-Instruct-FP8-block": {
+        "ctx": "65536",
+        "trust_remote": True,
+        "valid_tp": [1, 2],
+        "max_num_seqs": "64",
+        "max_tokens": "32768",
+    },
 }
 
 MODELS_TO_RUN = [
@@ -87,6 +96,7 @@ MODELS_TO_RUN = [
     "RedHatAI/Qwen3-14B-FP8-dynamic",
     "cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit",
     "cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit",
+    "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
 ]
 
 # =========================
@@ -110,46 +120,16 @@ def get_gpu_count():
         return 1
 
 def force_gpu_cleanup():
-    """Aggressively kill processes and WAIT until VRAM is actually free."""
-    max_retries = 10
-    
-    for i in range(max_retries):
-        # 1. Kill matching processes via name
+    """Simple cleanup: just kill vllm and proceed. No checks."""
+    try:
         subprocess.run("pkill -9 -f 'vllm'", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        
-        # 2. Kill processes via nvidia-smi (Driver reported)
-        try:
-            proc_res = subprocess.run(
-                ["nvidia-smi", "--query-compute-apps=pid", "--format=csv,noheader"],
-                capture_output=True, text=True
-            )
-            pids = [p.strip() for p in proc_res.stdout.split('\n') if p.strip()]
-            if pids:
-                log(f"Found lingering GPU processes via nvidia-smi: {pids}. Killing...")
-                subprocess.run(f"kill -9 {' '.join(pids)}", shell=True, stderr=subprocess.DEVNULL)
-        except: pass
-
-        time.sleep(2)
-
-        # 3. Check actual VRAM usage via nvidia-smi
-        try:
-            res = subprocess.run(
-                ["nvidia-smi", "--query-gpu=memory.used", "--format=csv,noheader,nounits"], 
-                capture_output=True, text=True
-            )
-            # Sum memory of all GPUs
-            used_mem = sum(int(x) for x in res.stdout.strip().split('\n') if x.strip())
-            
-            if used_mem < 1000: # If less than 1GB used, we are safe
-                if i > 0: log(f"GPU Cleaned after retry {i}. Usage: {used_mem} MiB")
-                return
-            
-            log(f"Waiting for GPU cleanup... ({used_mem} MiB still used)")
-        except Exception:
-            # If nvidia-smi fails, we just wait a bit and hope
-            time.sleep(2)
-            
-    log("WARNING: GPU validation timed out. Proceeding anyway (risk of OOM).")
+        subprocess.run("pkill -9 -f 'multiprocessing'", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run("pkill -9 -f 'resource_tracker'", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # Try finding fuser to kill processes attached to device files
+        if subprocess.run("which fuser", shell=True, stdout=subprocess.DEVNULL).returncode == 0:
+             subprocess.run("fuser -k -9 /dev/nvidia*", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except: pass
+    time.sleep(5)
 
 def nuke_vllm_cache():
     cache = Path.home() / ".cache" / "vllm"
@@ -211,13 +191,26 @@ else: log("Detected 32GB+ GPU class. Using standard config.")
 def get_model_args(model, tp_size):
     config = MODEL_TABLE.get(model, {"ctx": "8192", "max_num_seqs": "32"})
     
-    # --- DYNAMIC OVERRIDES ---
     current_ctx = config["ctx"]
-    if IS_24GB and model == "meta-llama/Meta-Llama-3.1-8B-Instruct":
-        current_ctx = "31800"
-        log(f"Override: Llama 8B ctx reduced to {current_ctx} for 24GB VRAM")
+    current_seqs = config["max_num_seqs"]
+    util = None
+
+    if IS_24GB:
+        if model == "meta-llama/Meta-Llama-3.1-8B-Instruct":
+            current_ctx = "31800"
+            log(f"Override: Llama 8B ctx reduced to {current_ctx} for 24GB VRAM")
+        elif model == "openai/gpt-oss-20b":
+            current_ctx = "16384"
+            current_seqs = "32"
+            util = "0.90"
+            log(f"Override: GPT-20B ctx reduced to {current_ctx}, seqs to {current_seqs}, util to {util} for 24GB VRAM")
+        elif model == "RedHatAI/Qwen3-14B-FP8-dynamic":
+            current_ctx = "4096"
+            current_seqs = "32"
+            util = "0.86"
+            log(f"Override: Qwen 14B ctx reduced to {current_ctx}, seqs to {current_seqs}, util to {util} for 24GB VRAM")
     
-    util = config.get("gpu_util", GPU_UTIL)
+    if util is None: util = config.get("gpu_util", GPU_UTIL)
     
     cmd = [
         "--model", model,
@@ -225,7 +218,7 @@ def get_model_args(model, tp_size):
         "--max-model-len", current_ctx, 
         "--dtype", "auto",
         "--tensor-parallel-size", str(tp_size),
-        "--max-num-seqs", config["max_num_seqs"]
+        "--max-num-seqs", current_seqs
     ]
     
     if config.get("trust_remote"): cmd.append("--trust-remote-code")

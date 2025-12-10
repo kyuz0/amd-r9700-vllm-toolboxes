@@ -88,6 +88,15 @@ MODEL_TABLE = {
         "enforce_eager": True, # Fixes Graph Capture crash
         "env": {"VLLM_USE_TRITON_AWQ": "1"} # Fixes "Unsupported Hardware" error
     },
+
+    # 6. Llama 3.1 8B FP8
+    "RedHatAI/Llama-3.1-8B-Instruct-FP8-block": {
+        "ctx": "65536",
+        "trust_remote": True,
+        "valid_tp": [1, 2],
+        "max_num_seqs": "64",
+        "max_tokens": "32768",
+    },
 }
 
 MODELS_TO_RUN = [
@@ -96,6 +105,7 @@ MODELS_TO_RUN = [
     "RedHatAI/Qwen3-14B-FP8-dynamic",
     "cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit",
     "cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit",
+    "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
 ]
 
 # =========================
