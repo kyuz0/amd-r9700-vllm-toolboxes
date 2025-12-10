@@ -105,7 +105,6 @@ MODELS_TO_RUN = [
     "RedHatAI/Qwen3-14B-FP8-dynamic",
     "cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit",
     "cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit",
-    "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
 ]
 
 # =========================
