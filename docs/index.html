@@ -336,6 +336,38 @@
             margin-left: 12px;
         }
 
+        /* Footer */
+        footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .sys-config {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+            max-width: 800px;
+        }
+
+        .sys-item {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            align-items: baseline;
+        }
+
+        .sys-label {
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #9ca3af;
+        }
+
         /* Tabs */
         .tab-nav {
             display: flex;
@@ -396,6 +428,36 @@
         <div id="dashboard">
             <div id="loading">Loading benchmark results...</div>
         </div>
+
+        <footer>
+            <div style="font-weight: 600; margin-bottom: 8px;">System Configuration</div>
+            <div class="sys-config">
+                <div class="sys-item">
+                    <span class="sys-label">GPUs</span>
+                    <span>2x AMD Radeon AI PRO R9700 (64GB Total VRAM)</span>
+                </div>
+                <div class="sys-item">
+                    <span class="sys-label">CPU</span>
+                    <span>AMD Ryzen 9 9900X3D</span>
+                </div>
+                <div class="sys-item">
+                    <span class="sys-label">Motherboard</span>
+                    <span>ASRock X870E Taichi</span>
+                </div>
+                <div class="sys-item">
+                    <span class="sys-label">RAM</span>
+                    <span>64GB Crucial Pro DDR5</span>
+                </div>
+                <div class="sys-item">
+                    <span class="sys-label">OS</span>
+                    <span>Fedora 43 (6.17.8-300.fc43.x86_64)</span>
+                </div>
+                <div class="sys-item">
+                    <span class="sys-label">ROCm</span>
+                    <span>7.2.53150 (Nightly Build)</span>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <!-- Modal Overlay -->
