@@ -119,11 +119,16 @@ def get_gpu_count():
         return 1
 
 def force_gpu_cleanup():
-    """Simple cleanup: just kill vllm and proceed. No checks."""
+    """Simple cleanup: just kill vllm processes (excluding self)."""
     try:
-        subprocess.run("pkill -9 -f 'vllm'", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        my_pid = os.getpid()
+        # Kill everything matching vllm EXCEPT this process
+        subprocess.run(f"pgrep -f 'vllm' | grep -v {my_pid} | xargs -r kill -9", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        
+        # Original cleanups for other helpers
         subprocess.run("pkill -9 -f 'multiprocessing'", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         subprocess.run("pkill -9 -f 'resource_tracker'", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        
         # Try finding fuser to kill processes attached to device files
         if subprocess.run("which fuser", shell=True, stdout=subprocess.DEVNULL).returncode == 0:
              subprocess.run("fuser -k -9 /dev/nvidia*", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
