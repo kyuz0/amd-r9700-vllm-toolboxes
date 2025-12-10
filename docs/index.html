@@ -1,47 +1,740 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>vLLM Benchmark Results</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>AMD R9700 vLLM Benchmarks</title>
+    <style>
+        :root {
+            --bg-body: #f9fafb;
+            --bg-card: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --primary: #ef4444;
+            /* AMD Red-ish */
+            --primary-bg: #fef2f2;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+        }
+
+        /* Header */
+        header {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            margin: 0 0 10px 0;
+            letter-spacing: -0.05rem;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            background: var(--bg-card);
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"],
+        select {
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-bg);
+        }
+
+        .search {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        /* Section Cards */
+        .section-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            margin-bottom: 32px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            background: #fcfcfc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Table */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            padding: 16px 24px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: #f9fafb;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Columns */
+        .col-model {
+            width: auto;
+        }
+
+        .col-data {
+            text-align: right;
+            width: 1%;
+            white-space: nowrap;
+            font-family: var(--font-mono);
+            font-feature-settings: "tnum";
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Model Cell Styling */
+        .model-cell {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .model-name {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .model-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #f3f4f6;
+            color: #4b5563;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        /* Data Styling */
+        .val {
+            font-weight: 600;
+        }
+
+        .val-na {
+            color: #d1d5db;
+            font-weight: 400;
+        }
+
+        .highlight {
+            color: var(--primary);
+        }
+
+        /* Modal/Overlay */
+        #loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            width: 90%;
+            max-width: 600px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            max-height: 85vh;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f9fafb;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .modal-section {
+            margin-bottom: 24px;
+        }
+
+        .modal-section h4 {
+            margin: 0 0 8px 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        .modal-section p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .code-block {
+            background: #f3f4f6;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #374151;
+            margin-top: 8px;
+            white-space: pre-wrap;
+        }
+
+        /* Help Button */
+        .btn-help {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn-help:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-bg);
+        }
+
+        .section-title-row {
+            display: flex;
+            align-items: center;
+        }
+
+        .section-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 400;
+            margin-left: 12px;
+        }
+
+        /* Tabs */
+        .tab-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            font-weight: 600;
+        }
+    </style>
 </head>
+
 <body>
+
     <div class="container">
         <header>
-            <h1>vLLM Performance Benchmarks</h1>
-            <p class="subtitle">AMD R9700 Series Performance Analysis</p>
+            <h1>AMD R9700 AI PRO vLLM Benchmarks</h1>
+            <p class="subtitle">Performance comparison on vLLM</p>
+            <p style="margin: 4px 0 0 0; font-size: 0.9rem;">
+                <a href="https://github.com/kyuz0/amd-r9700-vllm-toolboxes/" target="_blank"
+                    style="color: var(--primary); text-decoration: none;">View on GitHub &rarr;</a>
+            </p>
         </header>
 
-        <main>
-            <div class="controls">
-                <input type="text" id="searchInput" placeholder="Search models...">
-            </div>
+        <div class="controls">
+            <input type="text" id="searchInput" class="search" placeholder="Search models (e.g. 'llama', 'fp8')..."
+                autocomplete="off">
+            <select id="quantFilter">
+                <option value="">All Quantizations</option>
+            </select>
+        </div>
 
-            <div class="table-container">
-                <table id="benchmarkTable">
-                    <thead>
-                        <tr>
-                            <th data-sort="model">Model <span class="sort-icon">↕</span></th>
-                            <th data-sort="scenario">Scenario <span class="sort-icon">↕</span></th>
-                            <th data-sort="throughput_tokens_per_sec">Throughput (tok/s) <span class="sort-icon">↕</span></th>
-                            <th data-sort="requests_per_sec">Requests/s <span class="sort-icon">↕</span></th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <!-- Data will be populated here -->
-                    </tbody>
-                </table>
-            </div>
-        </main>
+        <nav id="tabNav" class="tab-nav">
+            <!-- Dynamic Tabs -->
+        </nav>
 
-        <footer>
-            <p>Generated by vLLM Toolbox</p>
-        </footer>
+        <div id="dashboard">
+            <div id="loading">Loading benchmark results...</div>
+        </div>
     </div>
-    <script src="script.js"></script>
+
+    <!-- Modal Overlay -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Benchmark Info</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalContent">
+                <!-- Dynamic Content -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let rawRuns = [];
+        let tests = [];
+        let state = {
+            search: "",
+            quant: "",
+            activeTab: "Throughput"
+        };
+
+        // Benchmark Metadata
+        const BENCHMARK_INFO = {
+            "Throughput": {
+                short: "Maximum raw compute capacity (Tokens/Sec).",
+                desc: "Measures the absolute maximum number of tokens the system can generate per second by fully saturating the GPU compute capability.",
+                usecase: "Demonstrates the raw horsepower and architectural efficiency of the hardware/model combo under Heavy Load. This is the theoretical speed limit of the system.",
+                details: "Command: `vllm bench throughput`\nParams: --num-prompts 100 --output-len 512\nMetric: Tokens per Second (higher is better).",
+                unit: " tok/s"
+            },
+            "TTFT": {
+                short: "Time To First Token (Response Latency).",
+                desc: "The 'Time To First Token' is the delay between sending a request and seeing the first character of the response.",
+                usecase: "<b>Responsiveness</b>. Low TTFT makes the AI feel 'snappy' and instant. High TTFT feels like the AI is ignoring you or lagging. We measure at different QPS loads to ensure the server doesn't 'choke' when busy.",
+                context: "<b>QPS = Queries Per Second (Traffic Load)</b>.<br>• QPS 1.0 = 1 user sending a request every second.<br>• QPS 4.0 = 4 users sending requests every second (Simulates High Load).",
+                details: "Command: `vllm bench serve`\nParams: --random-input-len 1024 --random-output-len 512\nMetric: Milliseconds (lower is better).",
+                unit: " ms"
+            },
+            "TPOT": {
+                short: "Time Per Output Token (Streaming Speed).",
+                desc: "The 'Time Per Output Token' measures how fast the text generates *after* the first token appears.",
+                usecase: "<b>1. Fluidity</b>: Industry standard is <50ms (>20 tok/s) for a 'fluid' feeling. Slower feels laggy.<br><b>2. Bottlenecks</b>: We test at <b>QPS 4.0</b> to find memory bandwidth bottlenecks where the GPU can't keep up with multiple users.",
+                context: "<b>QPS = Queries Per Second (Traffic Load)</b>.<br>• QPS 1.0 = Light Load (Ideal conditions)<br>• QPS 4.0 = Heavy Load (Stress Test)",
+                details: "Command: `vllm bench serve`\nParams: --random-input-len 1024 --random-output-len 512\nMetric: Milliseconds (lower is better).",
+                unit: " ms"
+            }
+        };
+
+        const $ = id => document.getElementById(id);
+
+        async function init() {
+            try {
+                const res = await fetch('results.json');
+                const data = await res.json();
+                rawRuns = data.runs || [];
+                processData();
+                render();
+                populateFilters();
+            } catch (e) {
+                $('loading').textContent = "Error loading results.json: " + e.message;
+                console.error(e);
+            }
+        }
+
+        function processData() {
+            const testGroups = {};
+
+            rawRuns.forEach(run => {
+                if (!run.test) return;
+                if (!testGroups[run.test]) {
+                    testGroups[run.test] = {
+                        name: run.test,
+                        models: {}
+                    };
+                }
+
+                // Normalize model name
+                const modelName = run.model_clean || run.model;
+
+                if (!testGroups[run.test].models[modelName]) {
+                    testGroups[run.test].models[modelName] = {
+                        name: modelName,
+                        quant: run.quant,
+                        params: run.params_b || run.name_params_b,
+                        tp1: null,
+                        tp2: null
+                    };
+                }
+
+                const m = testGroups[run.test].models[modelName];
+
+                // Assign TP value
+                if (run.env === "TP1") m.tp1 = run.tps_mean;
+                if (run.env === "TP2") m.tp2 = run.tps_mean;
+            });
+
+            // Convert map to array for sorting
+            tests = Object.values(testGroups).map(group => {
+                return {
+                    name: group.name,
+                    models: Object.values(group.models)
+                };
+            });
+
+            // Sort tests: Throughput first, then others alphabetically
+            tests.sort((a, b) => {
+                if (a.name === "Throughput") return -1;
+                if (b.name === "Throughput") return 1;
+                return a.name.localeCompare(b.name);
+            });
+
+            // Set default tab if not set
+            if (!state.activeTab && tests.length > 0) {
+                state.activeTab = tests[0].name;
+            }
+        }
+
+        function populateFilters() {
+            const quants = new Set(rawRuns.map(r => r.quant).filter(Boolean));
+            const sel = $('quantFilter');
+            [...quants].sort().forEach(q => {
+                const opt = document.createElement('option');
+                opt.value = q;
+                opt.textContent = q;
+                sel.appendChild(opt);
+            });
+
+            $('searchInput').addEventListener('input', e => {
+                state.search = e.target.value.toLowerCase();
+                render();
+            });
+
+            sel.addEventListener('change', e => {
+                state.quant = e.target.value;
+                render();
+            });
+        }
+
+        function getBenchmarkMeta(testName) {
+            if (testName.includes("Throughput")) return BENCHMARK_INFO["Throughput"];
+            if (testName.includes("TTFT")) return BENCHMARK_INFO["TTFT"];
+            if (testName.includes("TPOT")) return BENCHMARK_INFO["TPOT"];
+            return null;
+        }
+
+        function render() {
+            const container = $('dashboard');
+            const tabNav = $('tabNav');
+
+            // Render Tabs
+            tabNav.innerHTML = "";
+            tests.forEach(test => {
+                const btn = document.createElement('button');
+                btn.className = `tab-btn ${test.name === state.activeTab ? 'active' : ''}`;
+                btn.textContent = test.name;
+                btn.onclick = () => {
+                    state.activeTab = test.name;
+                    render();
+                };
+                tabNav.appendChild(btn);
+            });
+
+            // Ensure active tab exists (if search filtered it out logic?) 
+            // Actually tabs are based on 'tests' which is processed from raw data, so they exist regardless of filters unless we want to hide tabs with no results.
+            // For now, let's keep tabs static based on available data types.
+
+            container.innerHTML = "";
+
+            // Find active test
+            const activeTest = tests.find(t => t.name === state.activeTab);
+
+            if (!activeTest) {
+                // If invalid tab (e.g. on first load if default doesn't exist), switch to first
+                if (tests.length > 0) {
+                    state.activeTab = tests[0].name;
+                    // Re-render immediately
+                    setTimeout(render, 0);
+                }
+                container.innerHTML = '<div id="loading">No data available.</div>';
+                return;
+            }
+
+            // Render Active Tab Content
+            const test = activeTest;
+
+            // Filter models within this test
+            const models = test.models.filter(m => {
+                const s = state.search;
+                const matchSearch = !s || m.name.toLowerCase().includes(s);
+
+                const q = state.quant;
+                const matchQuant = !q || m.quant === q;
+
+                return matchSearch && matchQuant;
+            });
+
+            if (models.length === 0) {
+                container.innerHTML = '<div id="loading">No models match current filters in this category.</div>';
+                return;
+            }
+
+            // Sorting models by size (small to large), then name
+            models.sort((a, b) => {
+                const pA = parseFloat(a.params) || 0;
+                const pB = parseFloat(b.params) || 0;
+                if (pA !== pB) return pA - pB;
+                return a.name.localeCompare(b.name);
+            });
+
+            const card = document.createElement('div');
+            card.className = "section-card";
+
+            // Metadata resolution
+            const meta = getBenchmarkMeta(test.name);
+            const shortDesc = meta ? `<span class="section-desc">${meta.short}</span>` : "";
+            const helpBtn = meta ? `<button class="btn-help" onclick="openModal('${test.name}')">?</button>` : "";
+
+            const header = document.createElement('div');
+            header.className = "section-header";
+            header.innerHTML = `
+            <div class="section-title-row">
+                <h2>${test.name}</h2>
+                ${helpBtn}
+            </div>
+            ${shortDesc}
+        `;
+            card.appendChild(header);
+
+            const tableResp = document.createElement('div');
+            tableResp.className = "table-responsive";
+
+            const table = document.createElement('table');
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+            <tr>
+                <th class="col-model">Model</th>
+                <th class="col-data">TP1 (Single)</th>
+                <th class="col-data">TP2 (Dual)</th>
+            </tr>
+        `;
+            table.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+            models.forEach(m => {
+                const tr = document.createElement('tr');
+
+                // Meta tags
+                let metaHtml = "";
+                if (m.quant) metaHtml += `<span class="tag">${m.quant}</span>`;
+                if (m.params) metaHtml += `<span class="tag">${m.params}B</span>`;
+
+                // Values
+                // Pass unit from meta
+                const unit = meta ? meta.unit : "";
+                const val1 = formatVal(m.tp1, unit);
+                const val2 = formatVal(m.tp2, unit);
+
+                tr.innerHTML = `
+                <td>
+                    <div class="model-cell">
+                        <span class="model-name">${m.name}</span>
+                        <div class="model-meta">${metaHtml}</div>
+                    </div>
+                </td>
+                <td class="col-data">${val1}</td>
+                <td class="col-data">${val2}</td>
+            `;
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+            tableResp.appendChild(table);
+            card.appendChild(tableResp);
+
+            container.appendChild(card);
+        }
+
+        function formatVal(v, unit) {
+            if (v === null || v === undefined) return '<span class="val-na">N/A</span>';
+            if (v === 0) return '<span class="val-na">FAIL</span>';
+            return `<span class="val">${v.toFixed(2)}<span style="font-size:0.8em; color:#888;">${unit}</span></span>`;
+        }
+
+        // Modal Logic
+        function openModal(testName) {
+            const meta = getBenchmarkMeta(testName);
+            if (!meta) return;
+
+            $('modalTitle').textContent = testName;
+
+            let content = `
+            <div class="modal-section">
+                <h4>What is this?</h4>
+                <p>${meta.desc}</p>
+            </div>
+            <div class="modal-section">
+                <h4>Why it matters?</h4>
+                <p>${meta.usecase}</p>
+            </div>`;
+
+            if (meta.context) {
+                content += `
+                <div class="modal-section">
+                    <h4>Terminology</h4>
+                    <p>${meta.context}</p>
+                </div>`;
+            }
+
+            content += `
+            <div class="modal-section">
+                <h4>Technical Details</h4>
+                <div class="code-block">${meta.details}</div>
+            </div>
+            `;
+
+            $('modalContent').innerHTML = content;
+            $('modalOverlay').classList.add('active');
+        }
+
+        function closeModal() {
+            $('modalOverlay').classList.remove('active');
+        }
+
+        // Close on click outside
+        $('modalOverlay').addEventListener('click', e => {
+            if (e.target === $('modalOverlay')) closeModal();
+        });
+
+        // Close on Escape
+        document.addEventListener('keydown', e => {
+            if (e.key === "Escape") closeModal();
+        });
+
+        init();
+    </script>
+
 </body>
+
 </html>

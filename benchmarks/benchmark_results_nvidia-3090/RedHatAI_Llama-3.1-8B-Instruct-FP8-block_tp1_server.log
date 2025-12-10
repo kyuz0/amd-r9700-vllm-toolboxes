@@ -1,0 +1,95 @@
+WARNING 12-10 09:53:36 [argparse_utils.py:195] With `vllm serve`, you should provide the model as a positional argument or in a config file instead of via the `--model` option. The `--model` option will be removed in v0.13.
+[0;36m(APIServer pid=4288)[0;0m INFO 12-10 09:53:36 [api_server.py:1772] vLLM API server version 0.12.0
+[0;36m(APIServer pid=4288)[0;0m INFO 12-10 09:53:36 [utils.py:253] non-default args: {'model_tag': 'RedHatAI/Llama-3.1-8B-Instruct-FP8-block', 'host': '127.0.0.1', 'model': 'RedHatAI/Llama-3.1-8B-Instruct-FP8-block', 'trust_remote_code': True, 'max_model_len': 65536, 'gpu_memory_utilization': 0.95, 'max_num_seqs': 64}
+[0;36m(APIServer pid=4288)[0;0m The argument `trust_remote_code` is to be used with Auto classes. It has no effect here and is ignored.
+[0;36m(APIServer pid=4288)[0;0m INFO 12-10 09:53:47 [model.py:637] Resolved architecture: LlamaForCausalLM
+[0;36m(APIServer pid=4288)[0;0m INFO 12-10 09:53:47 [model.py:1750] Using max model len 65536
+[0;36m(APIServer pid=4288)[0;0m INFO 12-10 09:53:47 [scheduler.py:228] Chunked prefill is enabled with max_num_batched_tokens=2048.
+[0;36m(APIServer pid=4288)[0;0m Traceback (most recent call last):
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/huggingface_hub/utils/_http.py", line 409, in hf_raise_for_status
+[0;36m(APIServer pid=4288)[0;0m     response.raise_for_status()
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/requests/models.py", line 1026, in raise_for_status
+[0;36m(APIServer pid=4288)[0;0m     raise HTTPError(http_error_msg, response=self)
+[0;36m(APIServer pid=4288)[0;0m requests.exceptions.HTTPError: 503 Server Error: Service Temporarily Unavailable for url: https://huggingface.co/api/models/RedHatAI/Llama-3.1-8B-Instruct-FP8-block
+[0;36m(APIServer pid=4288)[0;0m 
+[0;36m(APIServer pid=4288)[0;0m The above exception was the direct cause of the following exception:
+[0;36m(APIServer pid=4288)[0;0m 
+[0;36m(APIServer pid=4288)[0;0m Traceback (most recent call last):
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/bin/vllm", line 7, in <module>
+[0;36m(APIServer pid=4288)[0;0m     sys.exit(main())
+[0;36m(APIServer pid=4288)[0;0m              ^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/vllm/entrypoints/cli/main.py", line 73, in main
+[0;36m(APIServer pid=4288)[0;0m     args.dispatch_function(args)
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/vllm/entrypoints/cli/serve.py", line 60, in cmd
+[0;36m(APIServer pid=4288)[0;0m     uvloop.run(run_server(args))
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/uvloop/__init__.py", line 96, in run
+[0;36m(APIServer pid=4288)[0;0m     return __asyncio.run(
+[0;36m(APIServer pid=4288)[0;0m            ^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/asyncio/runners.py", line 195, in run
+[0;36m(APIServer pid=4288)[0;0m     return runner.run(main)
+[0;36m(APIServer pid=4288)[0;0m            ^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/asyncio/runners.py", line 118, in run
+[0;36m(APIServer pid=4288)[0;0m     return self._loop.run_until_complete(task)
+[0;36m(APIServer pid=4288)[0;0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/uvloop/__init__.py", line 48, in wrapper
+[0;36m(APIServer pid=4288)[0;0m     return await main
+[0;36m(APIServer pid=4288)[0;0m            ^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/vllm/entrypoints/openai/api_server.py", line 1819, in run_server
+[0;36m(APIServer pid=4288)[0;0m     await run_server_worker(listen_address, sock, args, **uvicorn_kwargs)
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/vllm/entrypoints/openai/api_server.py", line 1838, in run_server_worker
+[0;36m(APIServer pid=4288)[0;0m     async with build_async_engine_client(
+[0;36m(APIServer pid=4288)[0;0m                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/contextlib.py", line 210, in __aenter__
+[0;36m(APIServer pid=4288)[0;0m     return await anext(self.gen)
+[0;36m(APIServer pid=4288)[0;0m            ^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/vllm/entrypoints/openai/api_server.py", line 183, in build_async_engine_client
+[0;36m(APIServer pid=4288)[0;0m     async with build_async_engine_client_from_engine_args(
+[0;36m(APIServer pid=4288)[0;0m                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/contextlib.py", line 210, in __aenter__
+[0;36m(APIServer pid=4288)[0;0m     return await anext(self.gen)
+[0;36m(APIServer pid=4288)[0;0m            ^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/vllm/entrypoints/openai/api_server.py", line 224, in build_async_engine_client_from_engine_args
+[0;36m(APIServer pid=4288)[0;0m     async_llm = AsyncLLM.from_vllm_config(
+[0;36m(APIServer pid=4288)[0;0m                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/vllm/v1/engine/async_llm.py", line 223, in from_vllm_config
+[0;36m(APIServer pid=4288)[0;0m     return cls(
+[0;36m(APIServer pid=4288)[0;0m            ^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/vllm/v1/engine/async_llm.py", line 114, in __init__
+[0;36m(APIServer pid=4288)[0;0m     tokenizer = init_tokenizer_from_config(self.model_config)
+[0;36m(APIServer pid=4288)[0;0m                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/vllm/tokenizers/registry.py", line 227, in init_tokenizer_from_config
+[0;36m(APIServer pid=4288)[0;0m     return get_tokenizer(
+[0;36m(APIServer pid=4288)[0;0m            ^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/vllm/tokenizers/registry.py", line 191, in get_tokenizer
+[0;36m(APIServer pid=4288)[0;0m     tokenizer = TokenizerRegistry.get_tokenizer(
+[0;36m(APIServer pid=4288)[0;0m                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/vllm/tokenizers/registry.py", line 86, in get_tokenizer
+[0;36m(APIServer pid=4288)[0;0m     return item.from_pretrained(*args, **kwargs)
+[0;36m(APIServer pid=4288)[0;0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/vllm/tokenizers/hf.py", line 84, in from_pretrained
+[0;36m(APIServer pid=4288)[0;0m     tokenizer = AutoTokenizer.from_pretrained(
+[0;36m(APIServer pid=4288)[0;0m                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/transformers/models/auto/tokenization_auto.py", line 1156, in from_pretrained
+[0;36m(APIServer pid=4288)[0;0m     return tokenizer_class.from_pretrained(pretrained_model_name_or_path, *inputs, **kwargs)
+[0;36m(APIServer pid=4288)[0;0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/transformers/tokenization_utils_base.py", line 2113, in from_pretrained
+[0;36m(APIServer pid=4288)[0;0m     return cls._from_pretrained(
+[0;36m(APIServer pid=4288)[0;0m            ^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/transformers/tokenization_utils_base.py", line 2395, in _from_pretrained
+[0;36m(APIServer pid=4288)[0;0m     tokenizer = cls._patch_mistral_regex(
+[0;36m(APIServer pid=4288)[0;0m                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/transformers/tokenization_utils_base.py", line 2438, in _patch_mistral_regex
+[0;36m(APIServer pid=4288)[0;0m     if _is_local or is_base_mistral(pretrained_model_name_or_path):
+[0;36m(APIServer pid=4288)[0;0m                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/transformers/tokenization_utils_base.py", line 2432, in is_base_mistral
+[0;36m(APIServer pid=4288)[0;0m     model = model_info(model_id)
+[0;36m(APIServer pid=4288)[0;0m             ^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+[0;36m(APIServer pid=4288)[0;0m     return fn(*args, **kwargs)
+[0;36m(APIServer pid=4288)[0;0m            ^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/huggingface_hub/hf_api.py", line 2638, in model_info
+[0;36m(APIServer pid=4288)[0;0m     hf_raise_for_status(r)
+[0;36m(APIServer pid=4288)[0;0m   File "/venv/main/lib/python3.12/site-packages/huggingface_hub/utils/_http.py", line 482, in hf_raise_for_status
+[0;36m(APIServer pid=4288)[0;0m     raise _format(HfHubHTTPError, str(e), response) from e
+[0;36m(APIServer pid=4288)[0;0m huggingface_hub.errors.HfHubHTTPError: 503 Server Error: Service Temporarily Unavailable for url: https://huggingface.co/api/models/RedHatAI/Llama-3.1-8B-Instruct-FP8-block

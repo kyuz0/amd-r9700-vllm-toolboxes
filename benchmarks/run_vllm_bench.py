@@ -97,6 +97,16 @@ MODEL_TABLE = {
         "max_num_seqs": "64",
         "max_tokens": "32768",
     },
+
+    # 7. Gemma 3 27B FP8
+    "RedHatAI/gemma-3-27b-it-FP8-dynamic": {
+        "ctx": "29000",
+        "trust_remote": True,
+        "valid_tp": [2],
+        "max_num_seqs": "32",
+        "max_tokens": "29000",
+        "gpu_util": "0.94",
+    },
 }
 
 MODELS_TO_RUN = [
@@ -105,6 +115,7 @@ MODELS_TO_RUN = [
     "RedHatAI/Qwen3-14B-FP8-dynamic",
     "cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit",
     "cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit",
+    "RedHatAI/gemma-3-27b-it-FP8-dynamic",
 ]
 
 # =========================
@@ -182,9 +193,12 @@ def wait_for_server(url, process, timeout=600):
 def get_model_args(model, tp_size):
     config = MODEL_TABLE.get(model, {"ctx": "8192", "max_num_seqs": "32"})
     
+    # Allow per-model GPU utilization override
+    util = config.get("gpu_util", GPU_UTIL)
+
     cmd = [
         "--model", model,
-        "--gpu-memory-utilization", GPU_UTIL,
+        "--gpu-memory-utilization", util,
         "--max-model-len", config["ctx"], 
         "--dtype", "auto",
         "--tensor-parallel-size", str(tp_size),
