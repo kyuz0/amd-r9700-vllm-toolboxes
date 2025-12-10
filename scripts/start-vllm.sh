@@ -188,9 +188,7 @@ configure_launch() {
                     fi
                     ;;
             esac
-                    fi
-                    ;;
-            esac
+
         elif [[ "$key" == "" || "$key" == $'\n' ]]; then
             break # Launch on ENTER from anywhere
         fi
