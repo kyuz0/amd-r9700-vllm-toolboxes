@@ -7,7 +7,7 @@ RUN dnf -y install --setopt=install_weak_deps=False --nodocs \
   gcc gcc-c++ binutils make ffmpeg-free \
   cmake ninja-build aria2c tar xz vim nano \
   libdrm-devel zlib-devel openssl-devel \
-  numactl-devel gperftools-libs \
+  numactl-devel gperftools-libs dialog \
   && dnf clean all && rm -rf /var/cache/dnf/*
 
 # 2. Install "TheRock" ROCm SDK (Tarball Method)

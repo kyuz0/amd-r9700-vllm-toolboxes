@@ -1,27 +1,25 @@
 #!/usr/bin/env bash
-# start-vllm.sh - Interactive vLLM Launcher for R9700
-# Features: Auto-GPU detection, TUI-like interface, Configurable defaults
-set -euo pipefail
+# start-vllm.sh - Interactive vLLM Launcher for R9700 using dialog (ncurses)
+# Features: Robust TUI, Auto-GPU detection, Configurable defaults
+set -u
 
-# --- Colors & Styles ---
-R=$'\e[0;31m'
-G=$'\e[0;32m'
-Y=$'\e[1;33m'
-B=$'\e[0;34m'
-C=$'\e[0;36m'
-W=$'\e[1;37m'
-N=$'\e[0m'
-DIM=$'\e[2m'
-BOLD=$'\e[1m'
+# --- Dependencies ---
+if ! command -v dialog >/dev/null 2>&1; then
+    echo "Error: 'dialog' is required for this interface."
+    echo "Please install it in your container (e.g., apt-get install dialog)"
+    exit 1
+fi
 
 # --- Configuration ---
 HOST="${HOST:-0.0.0.0}"
 PORT="${PORT:-8000}"
-# We rely on internal cache by default now
 CACHE_DIR="${HOME}/.cache/huggingface"
+TEMP_FILE=$(mktemp)
+
+# Cleanup on exit
+trap 'rm -f "$TEMP_FILE"' EXIT
 
 # Model Definitions (Format: "Name|Repo|MaxCtx|MaxTP|Flags|EnvVars")
-# Note: MaxTP=1 means strictly 1 GPU. MaxTP=2 means can scale.
 MODELS=(
     "Llama 3.1 8B Instruct|meta-llama/Meta-Llama-3.1-8B-Instruct|65536|2||"
     "GPT-OSS 20B|openai/gpt-oss-20b|32768|2|--trust-remote-code|"
@@ -31,25 +29,12 @@ MODELS=(
 )
 
 # --- Helpers ---
-clear_screen() { printf "\e[H\e[2J"; }
-cursor_to() { printf "\e[%s;%sH" "$1" "$2"; }
-print_bar() { printf "${DIM}%*s${N}\n" "${COLUMNS:-$(tput cols)}" '' | tr ' ' '-'; }
-center() { 
-    local text="$1"
-    local width="${COLUMNS:-$(tput cols)}"
-    local pad=$(( (width - ${#text}) / 2 ))
-    printf "%*s%s\n" $pad "" "$text"
-}
-
-# --- GPU Detection ---
 detect_gpus() {
     local count=0
     if command -v rocm-smi >/dev/null 2>&1; then
         count=$(rocm-smi --showid --csv 2>/dev/null | grep -c "GPU")
     fi
-    # Fallback to enumerating kfd/render devices if rocm-smi check weird
     if [[ "$count" -eq 0 ]]; then
-         # rough heuristic
          count=$(ls /dev/dri/renderD* 2>/dev/null | wc -l)
     fi
     echo "${count:-1}"
@@ -57,172 +42,124 @@ detect_gpus() {
 
 GPU_COUNT=$(detect_gpus)
 
-# --- Interface ---
-draw_header() {
-    clear_screen
-    echo -e "${B}"
-    center " ██    ██ ██      ██      ███    ███ "
-    center " ██    ██ ██      ██      ████  ████ "
-    center " ██    ██ ██      ██      ██ ████ ██ "
-    center "  ██  ██  ██      ██      ██  ██  ██ "
-    center "   ████   ███████ ███████ ██      ██ "
-    echo -e "${N}"
-    center "${DIM}AMD R9700 Launcher (Detected GPUs: ${W}${GPU_COUNT}${DIM})${N}"
-    print_bar
-}
+# --- Functions ---
 
 select_model() {
-    local selected=0
-    local key=""
-    
-    while true; do
-        draw_header
-        echo -e " ${BOLD}Select a Model to Serve:${N}\n"
-        
-        for i in "${!MODELS[@]}"; do
-            IFS='|' read -r name repo ctx tp flags env <<< "${MODELS[$i]}"
-            
-            prefix="   "
-            color="${N}"
-            if [[ "$i" -eq "$selected" ]]; then
-                prefix=" ${Y}●${N} "
-                color="${BOLD}${W}"
-            fi
-            
-            # Info string
-            info="${DIM}(Ctx: ${ctx}"
-            [[ "$tp" -eq 1 ]] && info="${info}, ${R}Single GPU${DIM}"
-            [[ "$tp" -eq 2 && "$GPU_COUNT" -ge 2 ]] && info="${info}, ${G}Dual GPU Ready${DIM}"
-            info="${info})${N}"
-            
-            printf "${prefix}${color}%-30s ${info}\n" "$name"
-        done
-        
-        echo -e "\n ${DIM}Use [UP/DOWN] to navigate, [ENTER] to select, [Q] to quit${N}"
-        
-        # Input loop
-        read -rsn1 key
-        if [[ "$key" == $'\x1b' ]]; then
-            read -rsn2 key
-            case "$key" in
-                '[A') # UP
-                    ((selected--)) || true
-                    [[ $selected -lt 0 ]] && selected=$(( ${#MODELS[@]} - 1 ))
-                    ;;
-                '[B') # DOWN
-                    ((selected++)) || true
-                    [[ $selected -ge ${#MODELS[@]} ]] && selected=0
-                    ;;
-            esac
-        elif [[ "$key" == "" || "$key" == $'\n' ]]; then
-            break # ENTER
-        elif [[ "$key" == "q" || "$key" == "Q" ]]; then
-            clear_screen; exit 0
-        fi
+    local options=()
+    for i in "${!MODELS[@]}"; do
+        IFS='|' read -r name repo ctx tp flags env <<< "${MODELS[$i]}"
+        options+=("$i" "$name")
     done
+
+    dialog --clear --backtitle "AMD R9700 vLLM Launcher (GPUs: $GPU_COUNT)" \
+           --title "Select Model" \
+           --menu "Choose a model to serve:" 20 60 10 \
+           "${options[@]}" 2> "$TEMP_FILE"
     
-    return "$selected"
+    local ret=$?
+    local choice=$(cat "$TEMP_FILE")
+
+    # Handle Cancel/Esc
+    if [[ "$ret" -ne 0 ]] || [[ -z "$choice" ]]; then
+        clear
+        echo "Selection cancelled or no choice made."
+        exit 0
+    fi
+
+    # Sanitize choice (must be integer)
+    if ! [[ "$choice" =~ ^[0-9]+$ ]]; then
+        clear
+        echo "Error: Invalid selection received from dialog: '$choice'"
+        exit 1
+    fi
+    
+    # Do not echo choice, just return success
+    return 0
 }
 
 configure_launch() {
     local idx="$1"
+    
+    # Verify index exists
+    if [[ -z "${MODELS[$idx]+exists}" ]]; then
+        echo "Error: Invalid model index '$idx'"
+        exit 1
+    fi
+
     IFS='|' read -r name repo max_ctx max_tp flags envs <<< "${MODELS[$idx]}"
     
     # Defaults
     local current_tp=$GPU_COUNT
-    # Clamp TP if model doesn't support it or we don't have enough GPUs
     if [[ "$max_tp" -lt "$current_tp" ]]; then current_tp="$max_tp"; fi
-    
     local current_ctx="$max_ctx"
-    
-    local selected_setting=0
-    
-    while true; do
-        draw_header
-        echo -e " ${BOLD}Configuration: ${C}${name}${N}\n"
-        
-        # Menu Items
-        local opts=(
-            "Tensor Parallelism (TP) : ${current_tp}"
-            "Context Length          : ${current_ctx}"
-            "Extra Flags             : ${flags}"
-            "${G}► LAUNCH SERVER${N}"
-        )
-        
-        for i in "${!opts[@]}"; do
-            prefix="   "
-            if [[ "$i" -eq "$selected_setting" ]]; then
-                prefix=" ${Y}●${N} "
-            fi
-            echo -e "${prefix}${opts[$i]}"
-        done
-        
-        echo -e "\n ${DIM}[UP/DOWN] Navigate, [LEFT/RIGHT] Change Value, [ENTER] to Launch${N}"
-        
-        read -rsn1 key
-        if [[ "$key" == $'\x1b' ]]; then
-            read -rsn2 key
-            case "$key" in
-                '[A') # UP
-                    ((selected_setting--)) || true
-                    [[ $selected_setting -lt 0 ]] && selected_setting=3
-                    ;;
-                '[B') # DOWN
-                    ((selected_setting++)) || true
-                    [[ $selected_setting -gt 3 ]] && selected_setting=0
-                    ;;
-                '[C') # RIGHT
-                    if [[ "$selected_setting" -eq 0 ]]; then
-                        # Toggle TP
-                        if [[ "$current_tp" -lt "$max_tp" && "$current_tp" -lt "$GPU_COUNT" ]]; then
-                             ((current_tp++)) || true
-                        fi
-                    fi
-                    ;;
-                '[D') # LEFT
-                     if [[ "$selected_setting" -eq 0 ]]; then
-                        # Toggle TP
-                        if [[ "$current_tp" -gt 1 ]]; then
-                             ((current_tp--)) || true
-                        fi
-                    fi
-                    ;;
-            esac
 
-        elif [[ "$key" == "" || "$key" == $'\n' ]]; then
-            break # Launch on ENTER from anywhere
-        fi
+    while true; do
+        dialog --clear --backtitle "AMD R9700 vLLM Launcher" \
+               --title "Configuration: $name" \
+               --menu "Customize Launch Parameters:" 15 60 5 \
+               "1" "Tensor Parallelism: $current_tp" \
+               "2" "Context Length:     $current_ctx" \
+               "3" "LAUNCH SERVER" 2> "$TEMP_FILE"
+        
+        local action=$(cat "$TEMP_FILE")
+        
+        case "$action" in
+            1)
+                dialog --title "Tensor Parallelism" \
+                       --rangebox "Set TP Size (1-$max_tp)" 10 40 1 "$max_tp" "$current_tp" 2> "$TEMP_FILE"
+                local new_tp=$(cat "$TEMP_FILE")
+                if [[ -n "$new_tp" ]]; then current_tp=$new_tp; fi
+                ;;
+            2)
+                dialog --title "Context Length" \
+                       --inputbox "Enter Max Context Length:" 10 40 "$current_ctx" 2> "$TEMP_FILE"
+                local new_ctx=$(cat "$TEMP_FILE")
+                if [[ -n "$new_ctx" ]]; then current_ctx=$new_ctx; fi
+                ;;
+            3)
+                break # Launch
+                ;;
+            *)
+                # Escape/Cancel goes back to model selection? 
+                # Or exit? Let's assume exit for safety, or return failure.
+                # Returning failure to loop back to model select is user friendly.
+                return 1
+                ;;
+        esac
     done
-    
-    # Launch
-    clear_screen
-    echo -e "${G}Initializing vLLM...${N}"
-    
-    # Construct Command
+
+    # --- Execute ---
     local cmd="vllm serve $repo --host $HOST --port $PORT --tensor-parallel-size $current_tp --max-model-len $current_ctx $flags"
     
-    # Print nice summary
-    print_bar
-    echo -e "${BOLD}Model:${N}  $name"
-    echo -e "${BOLD}Repo:${N}   $repo"
-    echo -e "${BOLD}TP:${N}     $current_tp"
-    echo -e "${BOLD}Ctx:${N}    $current_ctx"
-    [[ -n "$envs" ]] && echo -e "${BOLD}Env:${N}    $envs"
-    echo -e "${BOLD}Cmd:${N}    $cmd"
-    print_bar
-    echo
-    
-    # Execute
+    # Confirmation / Run
+    clear
+    echo "============================================================"
+    echo " Launching: $name"
+    echo " Command:   $cmd"
     if [[ -n "$envs" ]]; then
+        echo " Envs:      $envs"
         export $envs
     fi
+    echo "============================================================"
+    echo
     
-    # We do a little manual eval to handle the flag string logic safely enough for this context
     # shellcheck disable=SC2086
     exec $cmd
 }
 
-# --- Main ---
-select_model
-choice=$?
-configure_launch "$choice"
+# --- Main Loop ---
+while true; do
+    # Run directly, do not capture stdout!
+    select_model
+    if [[ $? -ne 0 ]]; then
+        exit 0 # Exit if select_model returned non-zero (cancel)
+    fi
+    
+    # Read choice from file
+    choice=$(cat "$TEMP_FILE")
+    
+    if ! configure_launch "$choice"; then
+        continue 
+    fi
+    break
+done
