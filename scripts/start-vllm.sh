@@ -19,14 +19,16 @@ TEMP_FILE=$(mktemp)
 # Cleanup on exit
 trap 'rm -f "$TEMP_FILE"' EXIT
 
-# Model Definitions (Format: "Name|Repo|MaxCtx|MaxTP|Flags|EnvVars")
-MODELS=(
-    "Llama 3.1 8B Instruct|meta-llama/Meta-Llama-3.1-8B-Instruct|65536|2||"
-    "GPT-OSS 20B|openai/gpt-oss-20b|32768|2|--trust-remote-code|"
-    "Qwen3 14B FP8|RedHatAI/Qwen3-14B-FP8-dynamic|32768|1|--trust-remote-code|"
-    "Qwen3 30B 4-bit (GPTQ)|cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit|24576|2|--trust-remote-code|"
-    "Qwen3 80B 4-bit (AWQ)|cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit|20480|2|--trust-remote-code --enforce-eager|VLLM_USE_TRITON_AWQ=1"
-)
+# Generate Model List dynamically from benchmark results
+if [ -f "$(dirname "$0")/generate_models_list.py" ]; then
+    mapfile -t MODELS < <(python3 "$(dirname "$0")/generate_models_list.py" "$GPU_COUNT")
+else
+    # Fallback if helper is missing (Safety)
+    MODELS=(
+        "Llama 3.1 8B Instruct|meta-llama/Meta-Llama-3.1-8B-Instruct|8192|1||"
+        "Error: generate_models_list.py not found|error|0|1||"
+    )
+fi
 
 # --- Helpers ---
 detect_gpus() {

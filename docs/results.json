@@ -27,32 +27,6 @@
       "tps_mean": 59.68
     },
     {
-      "model": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
-      "model_clean": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
-      "env": "TP2",
-      "gpu_config": "dual",
-      "quant": "FP8",
-      "params_b": 8.0,
-      "name_params_b": 8.0,
-      "backend": "vLLM",
-      "error": false,
-      "test": "TTFT @ QPS 4.0",
-      "tps_mean": 111.14
-    },
-    {
-      "model": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
-      "model_clean": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
-      "env": "TP2",
-      "gpu_config": "dual",
-      "quant": "FP8",
-      "params_b": 8.0,
-      "name_params_b": 8.0,
-      "backend": "vLLM",
-      "error": false,
-      "test": "TPOT @ QPS 4.0",
-      "tps_mean": 45.47
-    },
-    {
       "model": "openai/gpt-oss-20b",
       "model_clean": "openai/gpt-oss-20b",
       "env": "TP1",
@@ -131,30 +105,30 @@
       "tps_mean": 88.1
     },
     {
-      "model": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
-      "model_clean": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
+      "model": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
+      "model_clean": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
       "env": "TP2",
       "gpu_config": "dual",
       "quant": "FP8",
-      "params_b": 8.0,
-      "name_params_b": 8.0,
+      "params_b": 12.0,
+      "name_params_b": 12.0,
       "backend": "vLLM",
       "error": false,
       "test": "TTFT @ QPS 1.0",
-      "tps_mean": 101.99
+      "tps_mean": 89.11
     },
     {
-      "model": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
-      "model_clean": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
+      "model": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
+      "model_clean": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
       "env": "TP2",
       "gpu_config": "dual",
       "quant": "FP8",
-      "params_b": 8.0,
-      "name_params_b": 8.0,
+      "params_b": 12.0,
+      "name_params_b": 12.0,
       "backend": "vLLM",
       "error": false,
       "test": "TPOT @ QPS 1.0",
-      "tps_mean": 36.39
+      "tps_mean": 22.0
     },
     {
       "model": "cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit",
@@ -261,6 +235,19 @@
       "tps_mean": 45.17
     },
     {
+      "model": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
+      "model_clean": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
+      "env": "TP2",
+      "gpu_config": "dual",
+      "quant": "FP8",
+      "params_b": 12.0,
+      "name_params_b": 12.0,
+      "backend": "vLLM",
+      "error": false,
+      "test": "Throughput",
+      "tps_mean": 1325.705122782343
+    },
+    {
       "model": "openai/gpt-oss-20b",
       "model_clean": "openai/gpt-oss-20b",
       "env": "TP2",
@@ -284,7 +271,7 @@
       "backend": "vLLM",
       "error": false,
       "test": "Throughput",
-      "tps_mean": 651.5870402286138
+      "tps_mean": 680.226281561525
     },
     {
       "model": "RedHatAI/Qwen3-14B-FP8-dynamic",
@@ -300,6 +287,32 @@
       "tps_mean": 1360.3779166371198
     },
     {
+      "model": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
+      "model_clean": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
+      "env": "TP1",
+      "gpu_config": "single",
+      "quant": "FP8",
+      "params_b": 12.0,
+      "name_params_b": 12.0,
+      "backend": "vLLM",
+      "error": false,
+      "test": "TTFT @ QPS 4.0",
+      "tps_mean": 12436.56
+    },
+    {
+      "model": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
+      "model_clean": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
+      "env": "TP1",
+      "gpu_config": "single",
+      "quant": "FP8",
+      "params_b": 12.0,
+      "name_params_b": 12.0,
+      "backend": "vLLM",
+      "error": false,
+      "test": "TPOT @ QPS 4.0",
+      "tps_mean": 84.04
+    },
+    {
       "model": "openai/gpt-oss-20b",
       "model_clean": "openai/gpt-oss-20b",
       "env": "TP1",
@@ -313,30 +326,30 @@
       "tps_mean": 1095.31715306375
     },
     {
-      "model": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
-      "model_clean": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
-      "env": "TP1",
-      "gpu_config": "single",
+      "model": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
+      "model_clean": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
+      "env": "TP2",
+      "gpu_config": "dual",
       "quant": "FP8",
-      "params_b": 8.0,
-      "name_params_b": 8.0,
+      "params_b": 12.0,
+      "name_params_b": 12.0,
       "backend": "vLLM",
       "error": false,
       "test": "TTFT @ QPS 4.0",
-      "tps_mean": 8640.2
+      "tps_mean": 222.29
     },
     {
-      "model": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
-      "model_clean": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
-      "env": "TP1",
-      "gpu_config": "single",
+      "model": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
+      "model_clean": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
+      "env": "TP2",
+      "gpu_config": "dual",
       "quant": "FP8",
-      "params_b": 8.0,
-      "name_params_b": 8.0,
+      "params_b": 12.0,
+      "name_params_b": 12.0,
       "backend": "vLLM",
       "error": false,
       "test": "TPOT @ QPS 4.0",
-      "tps_mean": 83.22
+      "tps_mean": 54.74
     },
     {
       "model": "RedHatAI/gemma-3-27b-it-FP8-dynamic",
@@ -456,32 +469,6 @@
       "tps_mean": 47.9
     },
     {
-      "model": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
-      "model_clean": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
-      "env": "TP1",
-      "gpu_config": "single",
-      "quant": "FP8",
-      "params_b": 8.0,
-      "name_params_b": 8.0,
-      "backend": "vLLM",
-      "error": false,
-      "test": "TTFT @ QPS 1.0",
-      "tps_mean": 176.27
-    },
-    {
-      "model": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
-      "model_clean": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
-      "env": "TP1",
-      "gpu_config": "single",
-      "quant": "FP8",
-      "params_b": 8.0,
-      "name_params_b": 8.0,
-      "backend": "vLLM",
-      "error": false,
-      "test": "TPOT @ QPS 1.0",
-      "tps_mean": 61.92
-    },
-    {
       "model": "cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit",
       "model_clean": "cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit",
       "env": "TP1",
@@ -531,7 +518,7 @@
       "backend": "vLLM",
       "error": false,
       "test": "TTFT @ QPS 4.0",
-      "tps_mean": 76648.54
+      "tps_mean": 72209.01
     },
     {
       "model": "cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit",
@@ -544,7 +531,33 @@
       "backend": "vLLM",
       "error": false,
       "test": "TPOT @ QPS 4.0",
-      "tps_mean": 73.8
+      "tps_mean": 71.26
+    },
+    {
+      "model": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
+      "model_clean": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
+      "env": "TP1",
+      "gpu_config": "single",
+      "quant": "FP8",
+      "params_b": 12.0,
+      "name_params_b": 12.0,
+      "backend": "vLLM",
+      "error": false,
+      "test": "TTFT @ QPS 1.0",
+      "tps_mean": 104.59
+    },
+    {
+      "model": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
+      "model_clean": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
+      "env": "TP1",
+      "gpu_config": "single",
+      "quant": "FP8",
+      "params_b": 12.0,
+      "name_params_b": 12.0,
+      "backend": "vLLM",
+      "error": false,
+      "test": "TPOT @ QPS 1.0",
+      "tps_mean": 38.86
     },
     {
       "model": "cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit",
@@ -557,7 +570,7 @@
       "backend": "vLLM",
       "error": false,
       "test": "TTFT @ QPS 1.0",
-      "tps_mean": 531.42
+      "tps_mean": 519.96
     },
     {
       "model": "cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit",
@@ -570,7 +583,7 @@
       "backend": "vLLM",
       "error": false,
       "test": "TPOT @ QPS 1.0",
-      "tps_mean": 53.96
+      "tps_mean": 44.04
     },
     {
       "model": "openai/gpt-oss-20b",
@@ -625,19 +638,6 @@
       "tps_mean": 78.49
     },
     {
-      "model": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
-      "model_clean": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
-      "env": "TP1",
-      "gpu_config": "single",
-      "quant": "FP8",
-      "params_b": 8.0,
-      "name_params_b": 8.0,
-      "backend": "vLLM",
-      "error": false,
-      "test": "Throughput",
-      "tps_mean": 1121.463746572811
-    },
-    {
       "model": "meta-llama/Meta-Llama-3.1-8B-Instruct",
       "model_clean": "meta-llama/Meta-Llama-3.1-8B-Instruct",
       "env": "TP1",
@@ -662,6 +662,19 @@
       "error": false,
       "test": "TPOT @ QPS 1.0",
       "tps_mean": 37.1
+    },
+    {
+      "model": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
+      "model_clean": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
+      "env": "TP1",
+      "gpu_config": "single",
+      "quant": "FP8",
+      "params_b": 12.0,
+      "name_params_b": 12.0,
+      "backend": "vLLM",
+      "error": false,
+      "test": "Throughput",
+      "tps_mean": 859.7532189051877
     },
     {
       "model": "cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit",
@@ -701,19 +714,6 @@
       "error": false,
       "test": "Throughput",
       "tps_mean": 2736.811464734795
-    },
-    {
-      "model": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
-      "model_clean": "RedHatAI/Llama-3.1-8B-Instruct-FP8-block",
-      "env": "TP2",
-      "gpu_config": "dual",
-      "quant": "FP8",
-      "params_b": 8.0,
-      "name_params_b": 8.0,
-      "backend": "vLLM",
-      "error": false,
-      "test": "Throughput",
-      "tps_mean": 1759.5651246099912
     }
   ]
 }

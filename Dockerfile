@@ -6,8 +6,8 @@ RUN dnf -y install --setopt=install_weak_deps=False --nodocs \
   python3.13 python3.13-devel git rsync libatomic bash ca-certificates curl \
   gcc gcc-c++ binutils make ffmpeg-free \
   cmake ninja-build aria2c tar xz vim nano \
-  libdrm-devel zlib-devel openssl-devel \
-  numactl-devel gperftools-libs dialog \
+  libdrm-devel zlib-devel openssl-devel jq \
+  numactl-devel gperftools-libs dialog procps-ng \
   && dnf clean all && rm -rf /var/cache/dnf/*
 
 # 2. Install "TheRock" ROCm SDK (Tarball Method)
@@ -154,8 +154,10 @@ RUN chmod -R a+rwX /opt && \
 COPY scripts/01-rocm-envs.sh /etc/profile.d/01-rocm-envs.sh
 COPY scripts/99-toolbox-banner.sh /etc/profile.d/99-toolbox-banner.sh
 COPY scripts/zz-venv-last.sh /etc/profile.d/zz-venv-last.sh
-COPY scripts/start-vllm.sh /usr/local/bin/start-vllm
-RUN chmod 0644 /etc/profile.d/*.sh && chmod +x /usr/local/bin/start-vllm
+COPY scripts/start_vllm.py /usr/local/bin/start-vllm
+COPY benchmarks/max_context_results.json /opt/max_context_results.json
+COPY benchmarks/run_vllm_bench.py /opt/run_vllm_bench.py
+RUN chmod 0644 /etc/profile.d/*.sh && chmod +x /usr/local/bin/start-vllm && chmod 0644 /opt/max_context_results.json
 RUN printf 'ulimit -S -c 0\n' > /etc/profile.d/90-nocoredump.sh && chmod 0644 /etc/profile.d/90-nocoredump.sh
 
 CMD ["/bin/bash"]

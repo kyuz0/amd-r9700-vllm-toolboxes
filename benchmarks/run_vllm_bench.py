@@ -85,20 +85,11 @@ MODEL_TABLE = {
         "valid_tp": [2], # Too big for single GPU
         "max_num_seqs": "32", # Lower concurrency for safety
         "max_tokens": "16384", # Lower batch size because Eager mode is CPU intensive
-        "enforce_eager": True, # Fixes Graph Capture crash
+        "enforce_eager": False, 
         "env": {"VLLM_USE_TRITON_AWQ": "1"} # Fixes "Unsupported Hardware" error
     },
 
-    # 6. Llama 3.1 8B FP8
-    "RedHatAI/Llama-3.1-8B-Instruct-FP8-block": {
-        "ctx": "65536",
-        "trust_remote": True,
-        "valid_tp": [1, 2],
-        "max_num_seqs": "64",
-        "max_tokens": "32768",
-    },
-
-    # 7. Gemma 3 27B FP8
+    # 76 Gemma 3 27B FP8
     "RedHatAI/gemma-3-27b-it-FP8-dynamic": {
         "ctx": "29000",
         "trust_remote": True,
@@ -106,6 +97,15 @@ MODEL_TABLE = {
         "max_num_seqs": "32",
         "max_tokens": "29000",
         "gpu_util": "0.94",
+    },
+
+    # 7. Gemma 3 12B FP8
+    "RedHatAI/gemma-3-12b-it-FP8-dynamic": {
+        "ctx": "9900",
+        "trust_remote": True,
+        "valid_tp": [1, 2],
+        "max_num_seqs": "64",
+        "max_tokens": "9900",
     },
 }
 
@@ -116,6 +116,7 @@ MODELS_TO_RUN = [
     "cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit",
     "cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit",
     "RedHatAI/gemma-3-27b-it-FP8-dynamic",
+    "RedHatAI/gemma-3-12b-it-FP8-dynamic",
 ]
 
 # =========================

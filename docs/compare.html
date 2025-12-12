@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPU Comparison - AMD R9700 vs NVIDIA</title>
+    <style>
+        /* Inherited Styles from index.html (Light Theme) */
+        :root {
+            --bg-body: #f9fafb;
+            --bg-card: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --primary: #ef4444;
+            /* AMD Red */
+            --primary-bg: #fef2f2;
+            --nvidia-green: #22c55e;
+            --nvidia-bg: #f0fdf4;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        /* Header */
+        header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            margin: 0 0 10px 0;
+            letter-spacing: -0.05rem;
+            color: var(--text-main);
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            background: var(--bg-card);
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #fff;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .btn:hover {
+            color: var(--text-main);
+            border-color: var(--text-muted);
+        }
+
+        .btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Card / Table Container */
+        .section-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            margin-bottom: 32px;
+            overflow: hidden;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+        }
+
+        th {
+            background: #f9fafb;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            user-select: none;
+            vertical-align: middle;
+        }
+
+        /* Left-align model name */
+        th:first-child,
+        td:first-child {
+            text-align: left;
+        }
+
+        th:hover {
+            color: var(--text-main);
+            background: #f3f4f6;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #f9fafb;
+        }
+
+        /* Rank Badges */
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-right: 6px;
+            color: #fff;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .rank-1 {
+            background: #f59e0b;
+            border: 1px solid #d97706;
+        }
+
+        /* Gold */
+        .rank-2 {
+            background: #94a3b8;
+            border: 1px solid #64748b;
+        }
+
+        /* Silver */
+        .rank-3 {
+            background: #b45309;
+            border: 1px solid #78350f;
+        }
+
+        /* Bronze */
+
+        .rank-cell-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Specific Cell Styles */
+        .model-name {
+            font-weight: 600;
+            color: var(--text-main);
+            display: block;
+        }
+
+        .model-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .val-cell {
+            font-family: var(--font-mono);
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Highlight Winner Cell Background */
+        td.winner {
+            background-color: #f0fdf4;
+            /* Light Green */
+        }
+
+        /* AMD Column Highlight (Different background for visibility) */
+        .amd-col-header {
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .gpu-sub {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 400;
+            text-transform: none;
+            margin-top: 4px;
+            color: #9ca3af;
+        }
+
+        /* Metric Badge */
+        .metric-badge {
+            background: #f3f4f6;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Filter Styles */
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            user-select: none;
+            background: #fff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .toggle-label:hover {
+            border-color: var(--text-muted);
+        }
+
+        .toggle-label input {
+            accent-color: var(--primary);
+        }
+
+        .toggle-label.unchecked {
+            opacity: 0.6;
+            background: #f3f4f6;
+        }
+
+        .weight-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .weight-input input {
+            width: 60px;
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 24px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .price-input-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .price-input-group:last-child {
+            border-bottom: none;
+        }
+
+        .price-input-group input {
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            width: 100px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Single GPU Performance Comparison</h1>
+            <p class="subtitle">vLLM Decoding Throughput (Tokens/s)</p>
+            <div id="current-metric-display" class="metric-badge">Metric: Raw Tokens/s</div>
+            <p style="margin-top: 10px;">
+                <a href="index.html" style="color: var(--primary); text-decoration: none; font-weight: 500;">&larr; Back
+                    to Benchmarks</a>
+            </p>
+        </header>
+
+        <div class="controls-wrapper"
+            style="background: var(--bg-card); padding: 16px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); margin-bottom: 24px;">
+            <div class="controls"
+                style="margin-bottom: 0; box-shadow: none; border: none; padding: 0; background: none;">
+                <button class="btn active" onclick="setMetric('raw')">Raw Performance</button>
+                <button class="btn" onclick="setMetric('price')">Perf / $ (Price)</button>
+                <button class="btn" onclick="setMetric('power')">Perf / Watt (TDP)</button>
+                <button class="btn" onclick="setMetric('vram')">vRAM Value (MB/$)</button>
+                <button class="btn" onclick="setMetric('composite')">Composite Score</button>
+                <button class="btn" onclick="openPriceModal()"
+                    style="margin-left: auto; border-color: var(--primary); color: var(--primary);">✎ Edit
+                    Prices</button>
+            </div>
+
+            <!-- Price Config Modal -->
+            <div id="price-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closePriceModal()">&times;</span>
+                    <h2>Edit GPU Prices</h2>
+                    <p class="subtitle" style="margin-bottom: 20px;">Adjust prices to see how value metrics change.</p>
+                    <div id="price-inputs-container">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div style="margin-top: 20px; text-align: right;">
+                        <button class="btn" onclick="closePriceModal()">Cancel</button>
+                        <button class="btn active" onclick="savePrices()">Save & Recalculate</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weighted Scoring Controls (Initially Hidden) -->
+            <div id="weight-controls"
+                style="display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; align-items: center;">
+                    <div class="weight-input">
+                        <label>Perf/$ Weight:</label>
+                        <input type="number" id="w-price" value="1" min="0" max="10" step="0.1"
+                            onchange="renderTable()">
+                    </div>
+                    <div class="weight-input">
+                        <label>Perf/Watt Weight:</label>
+                        <input type="number" id="w-power" value="1" min="0" max="10" step="0.1"
+                            onchange="renderTable()">
+                    </div>
+                    <div class="weight-input">
+                        <label>vRAM/$ Weight:</label>
+                        <input type="number" id="w-vram" value="1" min="0" max="10" step="0.1" onchange="renderTable()">
+                    </div>
+                </div>
+                <p style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
+                    Adjust weights to customize the Composite Score. (vRAM/$ = GB per Dollar)
+                </p>
+            </div>
+
+            <div class="filter-group" id="gpu-filters">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="table-responsive">
+                <table id="comparison-table">
+                    <thead>
+                        <tr id="table-header">
+                            <!-- Populated by JS -->
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <footer>
+            * Prices are estimated market averages/MSRP. Power based on TDP.<br>
+            * <b>Composite Score</b> = Weighted index of Perf/$, Perf/Watt, and vRAM/$ (GB per Dollar). Higher is
+            better.
+        </footer>
+    </div>
+
+    <script>
+        // Reference Specs
+        const GPUS = [
+            { id: "AMD R9700", name: "AMD R9700 (32GB)", price: 1250, tdp: 300, vram: 32, vendor: "amd" },
+            { id: "NVIDIA RTX 3090", name: "RTX 3090 (24GB)", price: 1499, tdp: 350, vram: 24, vendor: "nvidia" },
+            { id: "NVIDIA RTX 4090", name: "RTX 4090 (24GB)", price: 2000, tdp: 450, vram: 24, vendor: "nvidia" },
+            { id: "NVIDIA RTX 5090", name: "RTX 5090 (32GB)", price: 2700, tdp: 575, vram: 32, vendor: "nvidia" },
+            { id: "NVIDIA RTX 5000 Ada", name: "RTX 5000 (32GB)", price: 4700, tdp: 250, vram: 32, vendor: "nvidia" },
+            { id: "NVIDIA A100", name: "A100 (40GB)", price: 9000, tdp: 300, vram: 40, vendor: "nvidia" }
+        ];
+
+        let rawData = [];
+        let currentMetric = 'raw'; // raw, price, power, composite
+        let sortCol = "AMD R9700"; // Default sort
+        let sortDesc = true;
+
+        let visibleGPUs = new Set(GPUS.map(g => g.id));
+
+        async function loadData() {
+            try {
+                const response = await fetch('comparison_results.json');
+                rawData = await response.json();
+                initFilters();
+                renderTable();
+            } catch (e) {
+                console.error("Failed to load data", e);
+                document.getElementById('table-body').innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 40px; color: var(--primary);">Error loading data. Ensure generate_comparison_data.py has been run.</td></tr>`;
+            }
+        }
+
+        function initFilters() {
+            const container = document.getElementById('gpu-filters');
+            container.innerHTML = `<span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Compare:</span>`;
+
+            GPUS.forEach(gpu => {
+                const label = document.createElement('label');
+                label.className = 'toggle-label';
+                label.innerHTML = `
+                    <input type="checkbox" checked onchange="toggleGPU('${gpu.id}')">
+                    ${gpu.name}
+                `;
+                container.appendChild(label);
+            });
+        }
+
+        function toggleGPU(id) {
+            if (visibleGPUs.has(id)) {
+                visibleGPUs.delete(id);
+            } else {
+                visibleGPUs.add(id);
+            }
+            renderTable();
+        }
+
+        function setMetric(metric) {
+            currentMetric = metric;
+
+            // Update buttons
+            document.querySelectorAll('.controls .btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Show/Hide Weight Controls
+            const wControls = document.getElementById('weight-controls');
+            if (metric === 'composite') {
+                wControls.style.display = 'block';
+            } else {
+                wControls.style.display = 'none';
+            }
+
+            // Update Label
+            const labels = {
+                'raw': 'Metric: Raw Throughput (Tokens/s)',
+                'price': 'Metric: Performance per Dollar (Tokens/s / $)',
+                'power': 'Metric: Performance per Watt (Tokens/s / W)',
+                'vram': 'Metric: vRAM Value (Megabytes per Dollar)',
+                'composite': 'Metric: Weighted Composite Score'
+            };
+            document.getElementById('current-metric-display').textContent = labels[metric];
+
+            renderTable();
+        }
+
+        function calculateValue(rawScore, gpuId, rowModelName) {
+            const gpu = GPUS.find(g => g.id === gpuId);
+            if (!gpu) return 0;
+
+            // For vRAM metric, we don't strictly require rawScore > 0 to have a value,
+            // BUT we want to mask it if the model can't run.
+            // For other metrics, we need rawScore.
+            if (!rawScore && currentMetric !== 'composite' && currentMetric !== 'vram') return 0;
+
+            // Strict masking for vRAM: If throughput is 0, value is 0 (useless for this model)
+            if (currentMetric === 'vram') {
+                if (!rawScore || rawScore <= 0) return 0;
+                // Return MB per Dollar
+                return (gpu.vram * 1024) / gpu.price;
+            }
+
+            if (currentMetric === 'price') {
+                return rawScore / gpu.price;
+            } else if (currentMetric === 'power') {
+                return rawScore / gpu.tdp;
+            } else if (currentMetric === 'composite') {
+                // Weights
+                const wPrice = parseFloat(document.getElementById('w-price').value) || 0;
+                const wPower = parseFloat(document.getElementById('w-power').value) || 0;
+                const wVram = parseFloat(document.getElementById('w-vram').value) || 0;
+                const totalWeight = wPrice + wPower + wVram;
+
+                if (totalWeight === 0) return 0;
+
+                // We need normalization contexts (Max values for the row/category)
+                const row = rawData.find(r => r.model_name === rowModelName);
+                if (!row) return 0;
+
+                // 1. Calculate raw metrics for ALL VISIBLE GPUs to find maxima
+                let maxPriceMet = 0;
+                let maxPowerMet = 0;
+                let maxVramMet = 0;
+
+                GPUS.forEach(g => {
+                    if (!visibleGPUs.has(g.id)) return;
+
+                    // Perf metrics
+                    const rs = row.gpus[g.id] || 0;
+
+                    if (rs > 0) {
+                        const pMet = rs / g.price;
+                        const wMet = rs / g.tdp;
+                        if (pMet > maxPriceMet) maxPriceMet = pMet;
+                        if (wMet > maxPowerMet) maxPowerMet = wMet;
+                    }
+
+                    // vRAM metrics (Static per GPU) - Normalize as MB/$
+                    const vMet = (g.vram * 1024) / g.price;
+                    if (vMet > maxVramMet) maxVramMet = vMet;
+                });
+
+                if (rawScore <= 0) return 0;
+
+                // 2. Normalize THIS gpu's scores
+                const myPriceMet = rawScore / gpu.price;
+                const myPowerMet = rawScore / gpu.tdp;
+                const myVramMet = (gpu.vram * 1024) / gpu.price;
+
+                const normPrice = maxPriceMet > 0 ? (myPriceMet / maxPriceMet) : 0;
+                const normPower = maxPowerMet > 0 ? (myPowerMet / maxPowerMet) : 0;
+                const normVram = maxVramMet > 0 ? (myVramMet / maxVramMet) : 0;
+
+                // 3. Weighted Average
+                const composite = (wPrice * normPrice + wPower * normPower + wVram * normVram) / totalWeight;
+
+                return composite * 100; // Scale 0-100
+            }
+            return rawScore;
+        }
+
+        function formatValue(val) {
+            if (val === 0 || val === undefined || isNaN(val)) return "-";
+
+            if (currentMetric === 'raw') return Math.round(val).toLocaleString();
+            if (currentMetric === 'price') return val.toFixed(2);
+            if (currentMetric === 'power') return val.toFixed(2);
+            if (currentMetric === 'vram') return Math.round(val) + " MB/$"; // Integer MB/$
+            if (currentMetric === 'composite') return Math.round(val);
+            return val;
+        }
+
+        function sortData() {
+            return [...rawData].sort((a, b) => {
+                let valA = 0;
+                let valB = 0;
+
+                // If sorting by Model Name
+                if (sortCol === 'Model') {
+                    return sortDesc ? b.model_name.localeCompare(a.model_name) : a.model_name.localeCompare(b.model_name);
+                }
+
+                // If sorting by GPU Value
+                const rawA = a.gpus[sortCol] || 0;
+                const rawB = b.gpus[sortCol] || 0;
+
+                valA = calculateValue(rawA, sortCol, a.model_name);
+                valB = calculateValue(rawB, sortCol, b.model_name);
+
+                return sortDesc ? valB - valA : valA - valB;
+            });
+        }
+
+        function handleHeaderClick(colId) {
+            if (sortCol === colId) {
+                sortDesc = !sortDesc;
+            } else {
+                sortCol = colId;
+                sortDesc = true;
+            }
+            renderTable();
+        }
+
+        function renderTable() {
+            const thead = document.getElementById('table-header');
+            const tbody = document.getElementById('table-body');
+            const sortedData = sortData();
+
+            const activeGPUS = GPUS.filter(g => visibleGPUs.has(g.id));
+
+            // 1. Render Header
+            let headerHTML = `<th onclick="handleHeaderClick('Model')">Model ${sortCol === 'Model' ? (sortDesc ? '↓' : '↑') : ''}</th>`;
+
+            activeGPUS.forEach(gpu => {
+                const isSorted = sortCol === gpu.id;
+                const arrow = isSorted ? (sortDesc ? '↓' : '↑') : '';
+                const formatArrow = `<span style="margin-left:4px; opacity: ${isSorted ? 1 : 0.3};"> ${arrow || '↕'}</span>`;
+
+                const amdClass = gpu.id === 'AMD R9700' ? 'amd-col-header' : '';
+                const subText = `$${gpu.price.toLocaleString()} | ${gpu.tdp}W`;
+
+                headerHTML += `
+                    <th class="${amdClass}" onclick="handleHeaderClick('${gpu.id}')">
+                        <div>${gpu.name} ${formatArrow}</div>
+                        <span class="gpu-sub">${subText}</span>
+                    </th>
+                `;
+            });
+            thead.innerHTML = headerHTML;
+
+            // 2. Render Rows
+            tbody.innerHTML = sortedData.map(row => {
+                let rowHTML = `<tr>
+                    <td>
+                        <span class="model-name">${row.model_name}</span>
+                        <!-- <span class="model-meta">Info/Meta</span> -->
+                    </td>`;
+
+                // Calculate all values for this row to determine Rankings
+                const rowValues = [];
+                activeGPUS.forEach(gpu => {
+                    const rawVal = row.gpus[gpu.id];
+                    const val = calculateValue(rawVal, gpu.id, row.model_name);
+                    rowValues.push({ id: gpu.id, val: val });
+                });
+
+                // Sort to find ranks (descending)
+                const sortedValues = [...rowValues].sort((a, b) => b.val - a.val);
+
+                // Map GPU ID to Rank (1, 2, 3...)
+                const ranks = {};
+                sortedValues.forEach((item, index) => {
+                    if (item.val > 0) {
+                        ranks[item.id] = index + 1;
+                    }
+                });
+
+                activeGPUS.forEach(gpu => {
+                    const rawVal = row.gpus[gpu.id];
+                    const val = calculateValue(rawVal, gpu.id, row.model_name);
+                    const rank = ranks[gpu.id];
+
+                    let cellClass = 'val-cell';
+                    let badgeHTML = '';
+
+                    // Only rank if we have enough competitors (>1)
+                    if (sortedValues.length > 1) {
+                        if (rank === 1) {
+                            cellClass += ' winner';
+                            badgeHTML = '<span class="rank-badge rank-1">1</span>';
+                        } else if (rank === 2) {
+                            badgeHTML = '<span class="rank-badge rank-2">2</span>';
+                        } else if (rank === 3) {
+                            badgeHTML = '<span class="rank-badge rank-3">3</span>';
+                        }
+                    }
+
+                    rowHTML += `<td class="${cellClass}">
+                        <div class="rank-cell-content">
+                            ${badgeHTML}
+                            <span>${formatValue(val)}</span>
+                        </div>
+                    </td>`;
+                });
+
+                rowHTML += `</tr>`;
+                return rowHTML;
+            }).join('');
+        }
+
+        // Initialize
+        loadData();
+
+        // Modal Functions
+        function openPriceModal() {
+            const container = document.getElementById('price-inputs-container');
+            container.innerHTML = '';
+
+            GPUS.forEach((gpu, index) => {
+                const div = document.createElement('div');
+                div.className = 'price-input-group';
+                div.innerHTML = `
+                    <label style="font-weight: 500; color: var(--text-main);">${gpu.name}</label>
+                    <div style="display:flex; align-items:center; gap:4px;">
+                        <span style="color:var(--text-muted);">$</span>
+                        <input type="number" id="price-input-${index}" value="${gpu.price}" min="0">
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            document.getElementById('price-modal').style.display = 'block';
+        }
+
+        function closePriceModal() {
+            document.getElementById('price-modal').style.display = 'none';
+        }
+
+        function savePrices() {
+            GPUS.forEach((gpu, index) => {
+                const input = document.getElementById(`price-input-${index}`);
+                if (input) {
+                    const newPrice = parseFloat(input.value);
+                    if (!isNaN(newPrice) && newPrice > 0) {
+                        gpu.price = newPrice;
+                        // Update default subtext in header if we wanted to rebuild header dynamically 
+                        // (renderTable does this already)
+                    }
+                }
+            });
+            closePriceModal();
+            renderTable(); // Re-render to show updated calculations
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function (event) {
+            const modal = document.getElementById('price-modal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+
+</html>

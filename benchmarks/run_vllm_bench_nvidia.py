@@ -88,6 +88,15 @@ MODEL_TABLE = {
         "max_num_seqs": "64",
         "max_tokens": "32768",
     },
+
+    # 7. Gemma 3 12B FP8
+    "RedHatAI/gemma-3-12b-it-FP8-dynamic": {
+        "ctx": "32768",
+        "trust_remote": True,
+        "valid_tp": [1, 2],
+        "max_num_seqs": "64",
+        "max_tokens": "32768",
+    },
 }
 
 MODELS_TO_RUN = [
@@ -96,6 +105,7 @@ MODELS_TO_RUN = [
     "RedHatAI/Qwen3-14B-FP8-dynamic",
     "cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit",
     "cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit",
+    "RedHatAI/gemma-3-12b-it-FP8-dynamic",
 ]
 
 # =========================

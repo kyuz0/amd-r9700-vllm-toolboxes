@@ -1,0 +1,50 @@
+[
+  {
+    "model_name": "RedHatAI/Qwen3-14B-FP8-dynamic",
+    "model_clean": "RedHatAI_Qwen3-14B-FP8-dynamic",
+    "gpus": {
+      "AMD R9700": 1360.3779166371198,
+      "NVIDIA RTX 3090": 512.5391321707765,
+      "NVIDIA RTX 4090": 832.9600726881711,
+      "NVIDIA RTX 5090": 3251.0147985872827,
+      "NVIDIA RTX 5000 Ada": 1826.0356413838635,
+      "NVIDIA A100": 2984.3323175624723
+    }
+  },
+  {
+    "model_name": "cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit",
+    "model_clean": "cpatonn_Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit",
+    "gpus": {
+      "AMD R9700": 1019.986034633913,
+      "NVIDIA RTX 3090": 2417.170549559942,
+      "NVIDIA RTX 4090": 3441.9784198061966,
+      "NVIDIA RTX 5090": 5550.512371624096,
+      "NVIDIA RTX 5000 Ada": 2407.9706011923054,
+      "NVIDIA A100": 3719.016081057382
+    }
+  },
+  {
+    "model_name": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+    "model_clean": "meta-llama_Meta-Llama-3.1-8B-Instruct",
+    "gpus": {
+      "AMD R9700": 1795.5908237208996,
+      "NVIDIA RTX 3090": 1830.1667164087519,
+      "NVIDIA RTX 4090": 2917.0500237249767,
+      "NVIDIA RTX 5090": 3197.1386468735236,
+      "NVIDIA RTX 5000 Ada": 2149.8297795990215,
+      "NVIDIA A100": 3771.8246502543934
+    }
+  },
+  {
+    "model_name": "openai/gpt-oss-20b",
+    "model_clean": "openai_gpt-oss-20b",
+    "gpus": {
+      "AMD R9700": 1095.31715306375,
+      "NVIDIA RTX 3090": 2066.190202557434,
+      "NVIDIA RTX 4090": 2685.5060579349843,
+      "NVIDIA RTX 5090": 6896.704477650824,
+      "NVIDIA RTX 5000 Ada": 2883.1478405820326,
+      "NVIDIA A100": 4726.040550232053
+    }
+  }
+]
