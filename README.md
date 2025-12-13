@@ -1,6 +1,6 @@
 # AMD Radeon 9700 AI PRO (gfx1201) — vLLM Toolbox/Container
 
-An **fedora-based** Docker/Podman container that is **Toolbx-compatible** (usable as a Fedora toolbox) for serving LLMs with **vLLM** on **AMD Radeon R9700 (gfx1201)**. Built on the PyTorch nightly base to make ROCm on R9700 practical for day‑to‑day use.
+An **fedora-based** Docker/Podman container that is **Toolbx-compatible** (usable as a Fedora toolbox) for serving LLMs with **vLLM** on **AMD Radeon R9700 (gfx1201)**. Built on the TheRock nightly builds for ROCM.
 
 ![Demo](demo.gif)
 
@@ -73,11 +73,12 @@ toolbox enter vllm-r9700
 
 **Model storage:** Models are downloaded to `~/.cache/huggingface` by default. This directory is shared with the host if you created the toolbox correctly, so downloads persist.
 
-Serve a model using the helper script **`start-vllm`** (it prints the exact `vllm serve` command and then runs it).
+### Serving a Model (Easiest Way)
+
+The toolbox includes a TUI wizard called **`start-vllm`** which includes pre-configured models and handles the launch flags for you. This is the easiest way to get started.
 
 ```bash
 start-vllm
-# pick a model from the menu; the script prints the serve command and launches it
 ```
 
 > **Cache note:** vLLM writes compiled kernels to `~/.cache/vllm/`.
@@ -96,7 +97,15 @@ distrobox create -n vllm-r9700 \
 distrobox enter vllm-r9700
 ```
 
-> **Verification:** Run `rocm-smi` or simply `start-vllm` to check GPU access.
+> **Verification:** Run `rocm-smi` to check GPU status.
+
+### Serving a Model (Easiest Way)
+
+The toolbox includes a TUI wizard called **`start-vllm`** which includes pre-configured models and handles the launch flags for you. This is the easiest way to get started.
+
+```bash
+start-vllm
+```
 
 ---
 
