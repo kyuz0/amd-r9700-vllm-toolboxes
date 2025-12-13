@@ -2,6 +2,7 @@
 
 An **fedora-based** Docker/Podman container that is **Toolbx-compatible** (usable as a Fedora toolbox) for serving LLMs with **vLLM** on **AMD Radeon R9700 (gfx1201)**. Built on the PyTorch nightly base to make ROCm on R9700 practical for day‑to‑day use.
 
+![Demo](demo.gif)
 
 ---
 
