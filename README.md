@@ -13,6 +13,7 @@ An **fedora-based** Docker/Podman container that is **Toolbx-compatible** (usabl
 * [2) Quickstart — Fedora Toolbx (development)](#2-quickstart--fedora-toolbx-development)
 * [3) Quickstart — Ubuntu (Distrobox)](#3-quickstart--ubuntu-distrobox)
 * [4) Testing the API](#4-testing-the-api)
+* [5) Use a Web UI for Chatting](#5-use-a-web-ui-for-chatting)
 
 
 ## Tested Models (Benchmarks)
@@ -129,5 +130,26 @@ MODEL=$(curl -s http://localhost:8000/v1/models | jq -r '.data[0].id') curl -X P
     \"model\": \"$MODEL\",
     \"messages\":[{\"role\":\"user\",\"content\":\"Hello! Test the performance.\"}]
   }"
+```
+
+---
+
+## 5) Use a Web UI for Chatting
+
+If vLLM is on a remote server, expose port 8000 via SSH port forwarding:
+
+```bash
+ssh -L 0.0.0.0:8000:localhost:8000 <vllm-host>
+```
+
+Then, you can start HuggingFace ChatUI like this (on your host):
+
+```bash
+docker run -p 3000:3000 \
+  --add-host=host.docker.internal:host-gateway \
+  -e OPENAI_BASE_URL=http://host.docker.internal:8000/v1 \
+  -e OPENAI_API_KEY=dummy \
+  -v chat-ui-data:/data \
+  ghcr.io/huggingface/chat-ui-db
 ```
 
