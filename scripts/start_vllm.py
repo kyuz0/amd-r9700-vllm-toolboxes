@@ -253,6 +253,10 @@ def configure_and_launch(model_idx, gpu_count):
                 clear_cache = False
              
         elif choice == "6":
+            # Toggle Eager Mode
+            use_eager = not use_eager
+             
+        elif choice == "7":
             # Launch
             break
             
