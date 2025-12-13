@@ -13,7 +13,6 @@ An **fedora-based** Docker/Podman container that is **Toolbx-compatible** (usabl
 * [2) Quickstart — Fedora Toolbx (development)](#2-quickstart--fedora-toolbx-development)
 * [3) Quickstart — Ubuntu (Distrobox)](#3-quickstart--ubuntu-distrobox)
 * [4) Testing the API](#4-testing-the-api)
-* [5) Quickstart — Podman/Docker](#5-quickstart--podmandocker)
 
 
 ## Tested Models (Benchmarks)
@@ -132,72 +131,3 @@ MODEL=$(curl -s http://localhost:8000/v1/models | jq -r '.data[0].id') curl -X P
   }"
 ```
 
----
-
-## 5) Quickstart — Podman/Docker
-
-Prefer this for persistent services. We map `~/.cache/huggingface` to ensure models persist between runs.
-
-**Llama 3.1 8B Instruct**
-
-```bash
-podman run -d --name vllm-llama3-8b \
-  --ipc=host \
-  --network host \
-  --device /dev/kfd \
-  --device /dev/dri \
-  --group-add video \
-  --group-add render \
-  -v ~/.cache/huggingface:/root/.cache/huggingface \
-  -v ~/.cache/vllm:/root/.cache/vllm \
-  docker.io/kyuz0/vllm-therock-gfx1201:latest \
-  bash -lc 'source /torch-therock/.venv/bin/activate; \
-    TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1 \
-    vllm serve meta-llama/Meta-Llama-3.1-8B-Instruct --dtype float16 \
-      --max-model-len 65536 \
-      --host 0.0.0.0 --port 8000'
-```
-
-**Qwen3 30B 4-bit (GPTQ)**
-
-```bash
-podman run -d --name vllm-qwen3-30b \
-  --ipc=host \
-  --network host \
-  --device /dev/kfd \
-  --device /dev/dri \
-  --group-add video \
-  --group-add render \
-  -v ~/.cache/huggingface:/root/.cache/huggingface \
-  -v ~/.cache/vllm:/root/.cache/vllm \
-  docker.io/kyuz0/vllm-therock-gfx1201:latest \
-  bash -lc 'source /torch-therock/.venv/bin/activate; \
-    TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1 \
-    vllm serve cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit --dtype float16 \
-      --max-model-len 24576 \
-      --host 0.0.0.0 --port 8000'
-```
-
-**Qwen3 80B 4-bit (AWQ) - DUAL GPU**
-
-```bash
-podman run -d --name vllm-qwen3-80b \
-  --ipc=host \
-  --network host \
-  --device /dev/kfd \
-  --device /dev/dri \
-  --group-add video \
-  --group-add render \
-  -v ~/.cache/huggingface:/root/.cache/huggingface \
-  -v ~/.cache/vllm:/root/.cache/vllm \
-  -e VLLM_USE_TRITON_AWQ=1 \
-  docker.io/kyuz0/vllm-therock-gfx1201:latest \
-  bash -lc 'source /torch-therock/.venv/bin/activate; \
-    TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1 \
-    vllm serve cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit \
-      --model cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit \
-      --tensor-parallel-size 2 \
-      --max-model-len 20480 \
-      --enforce-eager \
-      --host 0.0.0.0 --port 8000'
-```
