@@ -306,7 +306,8 @@ def verify_context(model, context_len):
     max_retries = 5
     for attempt in range(max_retries):
         try:
-            r = requests.post(url, json=payload, timeout=30)
+            # Increased timeout to 300s because prefilling 60k+ tokens takes time!
+            r = requests.post(url, json=payload, timeout=300)
             if r.status_code == 200:
                 return True, "Success"
             else:

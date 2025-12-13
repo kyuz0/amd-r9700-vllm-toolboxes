@@ -1,4 +1,4 @@
-# AMD R9700 — vLLM Toolbox/Container (gfx1201, PyTorch)
+# AMD Radeon 9700 AI PRO (gfx1201) — vLLM Toolbox/Container
 
 An **fedora-based** Docker/Podman container that is **Toolbx-compatible** (usable as a Fedora toolbox) for serving LLMs with **vLLM** on **AMD Radeon R9700 (gfx1201)**. Built on the PyTorch nightly base to make ROCm on R9700 practical for day‑to‑day use.
 
@@ -19,20 +19,22 @@ An **fedora-based** Docker/Podman container that is **Toolbx-compatible** (usabl
 
 View full benchmarks at: [https://kyuz0.github.io/amd-r9700-vllm-toolboxes/](https://kyuz0.github.io/amd-r9700-vllm-toolboxes/)
 
-| Model | GPUs (TP) | Mem Util | Context Capacity (1 / 4 / 8 / 16 Concurrency) |
-| :--- | :--- | :--- | :--- |
-| **`meta-llama/Meta-Llama-3.1-8B-Instruct`** | 1 | 0.98 | 127k / 127k / 127k / 127k |
-|  | 2 | 0.98 | 105k / 105k / 105k / 105k |
-| **`openai/gpt-oss-20b`** | 1 | 0.98 | 131k / 131k / 131k / 131k |
-|  | 2 | 0.95 | 131k / 131k / 131k / 131k |
-| **`RedHatAI/Qwen3-14B-FP8-dynamic`** | 1 | 0.98 | 41k / 41k / 41k / 41k |
-|  | 2 | 0.95 | 41k / 41k / 41k / 41k |
-| **`cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit`** | 1 | 0.98 | 151k / 151k / 151k / 151k |
-|  | 2 | 0.98 | 262k / 262k / 262k / 262k |
-| **`cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit`** | 2 | 0.98 | 145k / 156k / 156k / 156k |
-| **`RedHatAI/gemma-3-12b-it-FP8-dynamic`** | 1 | 0.98 | 8k / 8k / 8k / 8k |
-|  | 2 | 0.98 | 8k / 8k / 8k / 8k |
-| **`RedHatAI/gemma-3-27b-it-FP8-dynamic`** | 2 | 0.98 | 60k / 60k / 60k / 60k |
+**Table Key:** Cell values represent `Max Context Length (GPU Memory Utilization)`.
+
+| Model | TP | 1 Req | 4 Reqs | 8 Reqs | 16 Reqs |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **`meta-llama/Meta-Llama-3.1-8B-Instruct`** | 1 | 127k (0.98) | 127k (0.98) | 127k (0.98) | 127k (0.98) |
+|  | 2 | 105k (0.98) | 105k (0.98) | 105k (0.98) | 105k (0.98) |
+| **`openai/gpt-oss-20b`** | 1 | 131k (0.98) | 131k (0.98) | 131k (0.98) | 131k (0.98) |
+|  | 2 | 131k (0.95) | 131k (0.95) | 131k (0.95) | 131k (0.95) |
+| **`RedHatAI/Qwen3-14B-FP8-dynamic`** | 1 | 41k (0.98) | 41k (0.98) | 41k (0.98) | 41k (0.98) |
+|  | 2 | 41k (0.95) | 41k (0.95) | 41k (0.95) | 41k (0.95) |
+| **`cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit`** | 1 | 151k (0.98) | 151k (0.98) | 151k (0.98) | 151k (0.98) |
+|  | 2 | 262k (0.98) | 262k (0.98) | 262k (0.98) | 262k (0.98) |
+| **`cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit`** | 2 | 145k (0.98) | 156k (0.98) | 156k (0.98) | 156k (0.98) |
+| **`RedHatAI/gemma-3-12b-it-FP8-dynamic`** | 1 | 44k (0.98) | 45k (0.98) | 45k (0.98) | 45k (0.98) |
+|  | 2 | 126k (0.98) | 126k (0.98) | 121k (0.95) | 121k (0.95) |
+| **`RedHatAI/gemma-3-27b-it-FP8-dynamic`** | 2 | 60k (0.98) | 60k (0.98) | 60k (0.98) | 60k (0.98) |
 
 ### Advanced Tuning
 
