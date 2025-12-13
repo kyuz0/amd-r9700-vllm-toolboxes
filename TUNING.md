@@ -1,6 +1,6 @@
 # AMD Radeon 9700 AI PRO (Navi 48) Tuning Guide
 
-This guide show you how to enable undervolting and raise the power limit on the Sapphire Radeon PRO R9700 on Fedora 34. It might work with other R9700 cards (it doesn't with the ASUS one) and other Linux distributions.
+This guide show you how to enable undervolting and raise the power limit on the Radeon PRO R9700 on Fedora 43. 
 
 ## 1. Prerequisites (Enable Overclocking)
 
@@ -97,12 +97,12 @@ Run these commands to confirm settings are active.
 
 ```bash
 # Look for: OD_VDDGFX_OFFSET: -75mV
-cat /sys/class/drm/card1/device/pp_od_clk_voltage 
+cat /sys/class/drm/card0/device/pp_od_clk_voltage 
 ```
 
 **Check Power Limit:**
 
 ```bash
 # Should be ~315 W
-cat /sys/class/drm/card1/device/hwmon/hwmon*/power1_cap 
+cat /sys/class/drm/card0/device/hwmon/hwmon*/power1_cap 
 ```
