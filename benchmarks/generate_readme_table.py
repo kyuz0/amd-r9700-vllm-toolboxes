@@ -60,9 +60,42 @@ def main():
         tps = sorted(tree[model_name].keys())
         
         for i, tp in enumerate(tps):
+            # 1. Gather best raw results for each concurrency level
+            best_by_seq = {}
+            seq_levels = [1, 4, 8, 16]
+            
+            for seq in seq_levels:
+                candidates = tree[model_name][tp].get(seq, [])
+                if not candidates:
+                    continue
+                
+                # Sort criteria: Maximize Context, then Minimize Util
+                best = sorted(candidates, key=lambda x: (-x[0], x[1]))[0]
+                best_by_seq[seq] = best
+
+            # 2. Smooth/Backfill: Ensure Ctx(reqs=low) >= Ctx(reqs=high)
+            # If 4 users can do 156k, 1 user certainly can too.
+            # We take the standard of "Better" = (Higher Context, Lower Util)
+            final_values = {}
+            for i_seq, seq in enumerate(seq_levels):
+                # Gather all valid results from this level and higher
+                valid_futures = []
+                for future_seq in seq_levels[i_seq:]:
+                    if future_seq in best_by_seq:
+                        valid_futures.append(best_by_seq[future_seq])
+                
+                if not valid_futures:
+                    final_values[seq] = None
+                else:
+                    # Pick the best among them
+                    # best tuple -> max context, then min util
+                    # key function for max(): (context, -util)
+                    final_values[seq] = max(valid_futures, key=lambda x: (x[0], -x[1]))
+
+            # 3. Format Output
             row_cells = []
             
-            # Model Name (only first row per model)
+            # Model Name
             if i == 0:
                 row_cells.append(f"**`{model_name}`**")
             else:
@@ -72,22 +105,13 @@ def main():
             row_cells.append(str(tp))
             
             # Concurrency Columns
-            for seq in [1, 4, 8, 16]:
-                candidates = tree[model_name][tp].get(seq, [])
-                if not candidates:
+            for seq in seq_levels:
+                val = final_values.get(seq)
+                if val is None:
                     row_cells.append("Fail")
-                    continue
-                
-                # Sort criteria: 
-                # 1. Maximize Context (desc)
-                # 2. Minimize Utilization (asc) - tie breaker for same context
-                best = sorted(candidates, key=lambda x: (-x[0], x[1]))[0]
-                
-                ctx_val = best[0]
-                util_val = best[1]
-                
-                # Display format: "127k (0.98)"
-                row_cells.append(f"{format_context(ctx_val)} ({util_val:.2f})")
+                else:
+                    ctx_val, util_val = val
+                    row_cells.append(f"{format_context(ctx_val)} ({util_val:.2f})")
             
             print("| " + " | ".join(row_cells) + " |")
 

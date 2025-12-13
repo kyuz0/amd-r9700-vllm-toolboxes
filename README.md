@@ -19,6 +19,7 @@ An **fedora-based** Docker/Podman container that is **Toolbx-compatible** (usabl
 
 View full benchmarks at: [https://kyuz0.github.io/amd-r9700-vllm-toolboxes/](https://kyuz0.github.io/amd-r9700-vllm-toolboxes/)
 
+
 **Table Key:** Cell values represent `Max Context Length (GPU Memory Utilization)`.
 
 | Model | TP | 1 Req | 4 Reqs | 8 Reqs | 16 Reqs |
@@ -31,8 +32,8 @@ View full benchmarks at: [https://kyuz0.github.io/amd-r9700-vllm-toolboxes/](htt
 |  | 2 | 41k (0.95) | 41k (0.95) | 41k (0.95) | 41k (0.95) |
 | **`cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit`** | 1 | 151k (0.98) | 151k (0.98) | 151k (0.98) | 151k (0.98) |
 |  | 2 | 262k (0.98) | 262k (0.98) | 262k (0.98) | 262k (0.98) |
-| **`cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit`** | 2 | 145k (0.98) | 156k (0.98) | 156k (0.98) | 156k (0.98) |
-| **`RedHatAI/gemma-3-12b-it-FP8-dynamic`** | 1 | 44k (0.98) | 45k (0.98) | 45k (0.98) | 45k (0.98) |
+| **`cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit`** | 2 | 156k (0.98) | 156k (0.98) | 156k (0.98) | 156k (0.98) |
+| **`RedHatAI/gemma-3-12b-it-FP8-dynamic`** | 1 | 45k (0.98) | 45k (0.98) | 45k (0.98) | 45k (0.98) |
 |  | 2 | 126k (0.98) | 126k (0.98) | 121k (0.95) | 121k (0.95) |
 | **`RedHatAI/gemma-3-27b-it-FP8-dynamic`** | 2 | 60k (0.98) | 60k (0.98) | 60k (0.98) | 60k (0.98) |
 
