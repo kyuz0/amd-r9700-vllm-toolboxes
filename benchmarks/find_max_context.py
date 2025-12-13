@@ -47,31 +47,38 @@ REPORT_FILE = Path("max_context_report.md")
 # We test these GPU Utilizations steps to see how much we can squeeze
 # 0.90 is default, but we want MAX context.
 # 0.98 is our target high. 0.95 is the fallback.
-GPU_UTIL_STEPS = ["0.98", "0.95"]
+GPU_UTIL_STEPS = ["0.98", "0.95", "0.90"]
 # We test these concurrency settings
 CONCURRENCY_STEPS = [1, 4, 8, 16]
 
 def log(msg):    print(f"[MAX-CTX] {msg}", flush=True)
 
 def get_hf_context_limit(model_name, trust_remote=False):
-    """
-    Reads the model configuration to find the advertised max length.
-    """
     try:
         cfg = AutoConfig.from_pretrained(model_name, trust_remote_code=trust_remote)
-        
-        # Check standard attributes in order of likelihood
-        for attr in ["max_position_embeddings", "seq_length", "max_seq_len", "n_positions"]:
+
+        # Gemma 3 and similar multi-config models
+        if hasattr(cfg, "text_config"):
+            tc = cfg.text_config
+            if hasattr(tc, "max_position_embeddings"):
+                return int(tc.max_position_embeddings)
+
+        # Standard HF attributes
+        for attr in (
+            "max_position_embeddings",
+            "seq_length",
+            "max_seq_len",
+            "n_positions",
+        ):
             val = getattr(cfg, attr, None)
             if val is not None:
                 return int(val)
-        
-        # Fallback for Qwen or custom models if standard attrs fail
-        return 8192 # Safe fallback
-        
+
+        return 8192
+
     except Exception as e:
         log(f"Warning: Could not read config for {model_name}: {e}. Defaulting to 32768.")
-        return 32768 # Fallback to a reasonable default
+        return 32768
 
 def get_vllm_server_cmd(model, tp_size, util, max_len, max_seqs):
     """
@@ -216,9 +223,11 @@ def wait_for_server_and_parse(process, timeout=300):
             
             if not failure_reason:
                 # Unexpected death! Dump logs to see why.
-                log("CRITICAL: Process died unexpectedly! Last 30 lines:")
-                for l in logs[-30:]:
-                   log(f"   | {l}")
+                log("CRITICAL: Process died unexpectedly! Dumping last 100 lines:")
+                print("=== vLLM SERVER LOGS (LAST 100 LINES) ===")
+                for l in logs[-100:]:
+                    print(l)
+                print("=============================================")
                     
             return False, 0, 0, None, failure_reason
             
@@ -261,10 +270,18 @@ def wait_for_server_and_parse(process, timeout=300):
             # Check for startup
             if "Application startup complete" in line_str or "Uvicorn running on" in line_str:
                 if gpu_blocks > 0:
+                    log("  -> Server signal detected. Waiting 5s for socket stability...")
+                    time.sleep(5)
                     return True, gpu_blocks, block_size, max_len_clamped, None
                 else:
                     return False, 0, 0, None, "Parsed Success but Token/Block Count was 0"
                 
+    # Timeout case
+    log("CRITICAL: Server startup timed out! Dumping last 100 lines:")
+    print("=== vLLM SERVER LOGS (LAST 100 LINES) ===")
+    for l in logs[-100:]:
+        print(l)
+    print("=============================================")
     return False, 0, 0, None, "Timeout"
 
 def verify_context(model, context_len):
@@ -285,14 +302,28 @@ def verify_context(model, context_len):
         "temperature": 0
     }
     
-    try:
-        r = requests.post(url, json=payload) # Wait indefinitely (server closes socket on crash)
-        if r.status_code == 200:
-            return True, "Success"
-        else:
-            return False, f"HTTP {r.status_code}: {r.text[:200]}"
-    except Exception as e:
-        return False, str(e)
+    # Retry loop for connection refusals (race condition)
+    max_retries = 5
+    for attempt in range(max_retries):
+        try:
+            r = requests.post(url, json=payload, timeout=30)
+            if r.status_code == 200:
+                return True, "Success"
+            else:
+                # If 500 or 400 error, maybe we shouldn't retry? Usually yes for 500 if transient.
+                # But for now let's just fail or retry.
+                # If we are OOMing, we will likely get a 500 or it will hang.
+                return False, f"HTTP {r.status_code}: {r.text[:200]}"
+        except requests.exceptions.ConnectionError:
+            if attempt < max_retries - 1:
+                log(f"  -> Connection refused. Retrying verification ({attempt+1}/{max_retries})...")
+                time.sleep(2)
+            else:
+                return False, "Connection Refused (Max Retries)"
+        except Exception as e:
+            return False, str(e)
+            
+    return False, "Unknown Error"
 
 def run_probe(model, tp, util, max_seqs, start_limit=None):
     """
@@ -362,11 +393,20 @@ def run_probe(model, tp, util, max_seqs, start_limit=None):
                     log(f"  -> Server started, but Verification FAILED: {v_msg}")
                     # Treat as a crash/failure, back off
                     fail_msg = "Verification Failed"
-                    # Fall through to failure handling (force cleanup happens next loop)
-                    # We manually kill this instance though
+                    
+                    # Capture any remaining logs if the process is dead or dying
+                    # Or just read what's currently available non-blocking? 
+                    # Simpler: just terminate and read output.
                     proc.terminate()
-                    try: proc.wait(timeout=5)
-                    except: proc.kill()
+                    try: 
+                        outs, errs = proc.communicate(timeout=5)
+                        if outs:
+                            print("=== vLLM SERVER LOGS (DURING VERIFICATION FAILURE) ===")
+                            print(outs.decode('utf-8', errors='replace'))
+                            print("======================================================")
+                    except: 
+                        proc.kill()
+
             
             # If we fall through here, ready=False OR verify=False
             log(f"  -> Attempt failed at {target_len}")

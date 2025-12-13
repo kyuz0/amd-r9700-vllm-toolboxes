@@ -4,6 +4,7 @@
     "model_clean": "RedHatAI_Qwen3-14B-FP8-dynamic",
     "gpus": {
       "AMD R9700": 1360.3779166371198,
+      "AMD R9700 (UV+PL)": 1484.1354103024892,
       "NVIDIA RTX 3090": 512.5391321707765,
       "NVIDIA RTX 4090": 832.9600726881711,
       "NVIDIA RTX 5090": 3251.0147985872827,
@@ -16,6 +17,7 @@
     "model_clean": "cpatonn_Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit",
     "gpus": {
       "AMD R9700": 1019.986034633913,
+      "AMD R9700 (UV+PL)": 1089.8731231693348,
       "NVIDIA RTX 3090": 2417.170549559942,
       "NVIDIA RTX 4090": 3441.9784198061966,
       "NVIDIA RTX 5090": 5550.512371624096,
@@ -28,6 +30,7 @@
     "model_clean": "meta-llama_Meta-Llama-3.1-8B-Instruct",
     "gpus": {
       "AMD R9700": 1795.5908237208996,
+      "AMD R9700 (UV+PL)": 2077.5827013698454,
       "NVIDIA RTX 3090": 1830.1667164087519,
       "NVIDIA RTX 4090": 2917.0500237249767,
       "NVIDIA RTX 5090": 3197.1386468735236,
@@ -40,6 +43,7 @@
     "model_clean": "openai_gpt-oss-20b",
     "gpus": {
       "AMD R9700": 1095.31715306375,
+      "AMD R9700 (UV+PL)": 1225.6785068919007,
       "NVIDIA RTX 3090": 2066.190202557434,
       "NVIDIA RTX 4090": 2685.5060579349843,
       "NVIDIA RTX 5090": 6896.704477650824,

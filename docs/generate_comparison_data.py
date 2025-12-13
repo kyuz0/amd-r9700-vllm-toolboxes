@@ -11,6 +11,7 @@ OUTPUT_FILE = SCRIPT_DIR / "comparison_results.json"
 # GPU Mapping
 GPU_MAP = {
     "benchmark_results_amd-r9700": "AMD R9700",
+    "benchmark_results_amd-r9700-uv+pl": "AMD R9700 (UV+PL)",
     "benchmark_results_nvidia-3090": "NVIDIA RTX 3090",
     "benchmark_results_nvidia-4090": "NVIDIA RTX 4090",
     "benchmark_results_nvidia-5090": "NVIDIA RTX 5090",

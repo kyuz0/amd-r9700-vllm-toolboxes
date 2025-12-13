@@ -17,17 +17,26 @@ An **fedora-based** Docker/Podman container that is **Toolbx-compatible** (usabl
 
 ## Tested Models (Benchmarks)
 
-Models verified in `run_vllm_bench.py`.
+View full benchmarks at: [https://kyuz0.github.io/amd-r9700-vllm-toolboxes/](https://kyuz0.github.io/amd-r9700-vllm-toolboxes/)
 
-| Model | Specs | GPUs (TP) | Context Limit | Required Flags / Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| **`meta-llama/Meta-Llama-3.1-8B-Instruct`** | 8B | 1 or 2 | 65k | Reliable baseline. Scaled down from 131k for safety. |
-| **`openai/gpt-oss-20b`** | 20B | 1 or 2 | 32k | Works well. |
-| **`RedHatAI/Qwen3-14B-FP8-dynamic`** | 14B FP8 | **1 Only** | 32k | **FP8**. Good single card performance. |
-| **`cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit`** | 30B 4-bit | 1 or 2 | 24k | **GPTQ**. Solid coder model. |
-| **`cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit`** | 80B 4-bit | **2 Only** | 20k | **AWQ**. Requires `--enforce-eager` and `VLLM_USE_TRITON_AWQ=1`. |
+| Model | GPUs (TP) | Mem Util | Context Capacity (1 / 4 / 8 / 16 Concurrency) |
+| :--- | :--- | :--- | :--- |
+| **`meta-llama/Meta-Llama-3.1-8B-Instruct`** | 1 | 0.98 | 127k / 127k / 127k / 127k |
+|  | 2 | 0.98 | 105k / 105k / 105k / 105k |
+| **`openai/gpt-oss-20b`** | 1 | 0.98 | 131k / 131k / 131k / 131k |
+|  | 2 | 0.95 | 131k / 131k / 131k / 131k |
+| **`RedHatAI/Qwen3-14B-FP8-dynamic`** | 1 | 0.98 | 41k / 41k / 41k / 41k |
+|  | 2 | 0.95 | 41k / 41k / 41k / 41k |
+| **`cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit`** | 1 | 0.98 | 151k / 151k / 151k / 151k |
+|  | 2 | 0.98 | 262k / 262k / 262k / 262k |
+| **`cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit`** | 2 | 0.98 | 145k / 156k / 156k / 156k |
+| **`RedHatAI/gemma-3-12b-it-FP8-dynamic`** | 1 | 0.98 | 8k / 8k / 8k / 8k |
+|  | 2 | 0.98 | 8k / 8k / 8k / 8k |
+| **`RedHatAI/gemma-3-27b-it-FP8-dynamic`** | 2 | 0.98 | 60k / 60k / 60k / 60k |
 
-> **Note:** These models are configured in `benchmarks/run_vllm_bench.py`. The 80B model requires dual R9700s (64GB total VRAM) and runs in eager mode to avoid graph capture OOMs.
+### Advanced Tuning
+
+See [TUNING.md](TUNING.md) for a guide on how to enable undervolting and raise the power limit on AMD R9700 cards on Linux to improve performance and efficiency.
 
 
 ---

@@ -454,40 +454,6 @@
     "max_context_1_user": 156128
   },
   {
-    "model": "RedHatAI/gemma-3-27b-it-FP8-dynamic",
-    "tp": 2,
-    "util": "0.98",
-    "max_seqs": 1,
-    "model_limit": 8192,
-    "configured_len": 0,
-    "real_capacity": 0,
-    "status": "fail",
-    "error": "Verification Failed"
-  },
-  {
-    "model": "RedHatAI/gemma-3-27b-it-FP8-dynamic",
-    "tp": 2,
-    "util": "0.95",
-    "max_seqs": 1,
-    "model_limit": 8192,
-    "configured_len": 8192,
-    "real_capacity": 56112,
-    "status": "success",
-    "error": "",
-    "max_context_1_user": 8192
-  },
-  {
-    "model": "RedHatAI/gemma-3-27b-it-FP8-dynamic",
-    "tp": 2,
-    "util": "0.95",
-    "max_seqs": 4,
-    "model_limit": 8192,
-    "configured_len": 0,
-    "real_capacity": 0,
-    "status": "fail",
-    "error": "Verification Failed"
-  },
-  {
     "model": "RedHatAI/gemma-3-12b-it-FP8-dynamic",
     "tp": 1,
     "util": "0.98",
@@ -582,5 +548,53 @@
     "status": "success",
     "error": "",
     "max_context_1_user": 8192
+  },
+  {
+    "model": "RedHatAI/gemma-3-27b-it-FP8-dynamic",
+    "tp": 2,
+    "util": "0.98",
+    "max_seqs": 1,
+    "model_limit": 131072,
+    "configured_len": 131072,
+    "real_capacity": 59728,
+    "status": "success",
+    "error": "",
+    "max_context_1_user": 59728
+  },
+  {
+    "model": "RedHatAI/gemma-3-27b-it-FP8-dynamic",
+    "tp": 2,
+    "util": "0.98",
+    "max_seqs": 4,
+    "model_limit": 131072,
+    "configured_len": 131072,
+    "real_capacity": 59760,
+    "status": "success",
+    "error": "",
+    "max_context_1_user": 59760
+  },
+  {
+    "model": "RedHatAI/gemma-3-27b-it-FP8-dynamic",
+    "tp": 2,
+    "util": "0.98",
+    "max_seqs": 8,
+    "model_limit": 131072,
+    "configured_len": 131072,
+    "real_capacity": 59760,
+    "status": "success",
+    "error": "",
+    "max_context_1_user": 59760
+  },
+  {
+    "model": "RedHatAI/gemma-3-27b-it-FP8-dynamic",
+    "tp": 2,
+    "util": "0.98",
+    "max_seqs": 16,
+    "model_limit": 131072,
+    "configured_len": 131072,
+    "real_capacity": 59760,
+    "status": "success",
+    "error": "",
+    "max_context_1_user": 59760
   }
 ]
