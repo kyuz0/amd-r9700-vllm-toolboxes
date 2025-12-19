@@ -58,7 +58,7 @@ RUN python -m pip install --upgrade pip wheel packaging "setuptools<80.0.0"
 
 # 5. Install PyTorch (TheRock Nightly)
 RUN python -m pip install \
-  --index-url https://rocm.nightlies.amd.com/v2-staging/gfx120X-all/ \
+  --index-url https://rocm.nightlies.amd.com/v2/gfx120X-all/ \
   --pre torch torchaudio torchvision
 
 # Flash-Attention
