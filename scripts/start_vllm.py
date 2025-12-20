@@ -139,24 +139,27 @@ def configure_and_launch(model_idx, gpu_count):
     
     clear_cache = False
     use_eager = config.get("enforce_eager", False) # Default to model config, usually False
+    use_rocm_attn = False # Default to Triton
     
     name = model_id.split("/")[-1]
     
     while True:
         cache_status = "YES" if clear_cache else "NO"
         eager_status = "YES" if use_eager else "NO"
+        attn_backend = "ROCm" if use_rocm_attn else "Triton"
         
         menu_args = [
             "--clear", "--backtitle", f"AMD R9700 vLLM Launcher (GPUs: {gpu_count})",
             "--title", f"Configuration: {name}",
-            "--menu", "Customize Launch Parameters:", "20", "65", "8",
+            "--menu", "Customize Launch Parameters:", "22", "65", "9",
             "1", f"Tensor Parallelism:   {current_tp}",
             "2", f"Concurrent Requests:  {current_seqs}",
             "3", f"Context Length:       {current_ctx} (Verified)",
             "4", f"GPU Utilization:      {current_util} (Verified)",
-            "5", f"Erase vLLM Cache:     {cache_status}",
-            "6", f"Force Eager Mode:     {eager_status}",
-            "7", "LAUNCH SERVER"
+            "5", f"Attention Backend:    {attn_backend}",
+            "6", f"Erase vLLM Cache:     {cache_status}",
+            "7", f"Force Eager Mode:     {eager_status}",
+            "8", "LAUNCH SERVER"
         ]
         
         choice = run_dialog(menu_args)
@@ -207,6 +210,10 @@ def configure_and_launch(model_idx, gpu_count):
              pass 
 
         elif choice == "5":
+            # Toggle Attention Backend
+            use_rocm_attn = not use_rocm_attn
+
+        elif choice == "6":
             # Toggle Cache
             if not clear_cache:
                 # Enabling it -> Show Warning
@@ -221,42 +228,19 @@ def configure_and_launch(model_idx, gpu_count):
                     "--title", "Erase Cache Warning", 
                     "--yesno", warn_msg, "12", "60"
                 ])
-                # dialog returns '0' string or empty string on some versions? 
-                # Actually run_dialog returns content of stderr. 
-                # Dialog --yesno returns exit code 0 for yes, 1 for no.
-                # My run_dialog wrapper captures stderr but `subprocess.run(check=True)` raises error on non-zero exit code!
-                # Wait, run_dialog implementation:
-                # `subprocess.run(cmd, ..., check=True)`
-                # If exit code is 1 (No/Cancel), it raises CalledProcessError.
-                # So if it returns, it is YES.
                 
-                # Let's double check run_dialog implementation in the file view.
-                # Lines 90-93:
-                # try: subprocess.run(cmd, ..., check=True) ... return tf.read()
-                # except CalledProcessError: return None
-                
-                # So if user selects YES (exit 0) -> returns empty string (stderr empty for yesno?) or something?
-                # Actually dialog yesno does not write to stderr?
-                # Whatever it returns, if it is not None, it is YES.
-                # Let's verify that logic.
-                
-                # Actually, dialog --yesno output nothing to stderr. It communicates via exit code.
-                # If logic is: check=True raises on exit code 1.
-                # So YES = returns "" (empty string)
-                # NO = raises -> returns None.
-                
-                # So:
+                # If confirm is not None (exit 0), it is YES.
                 if confirm is not None:
                      clear_cache = True
             else:
                 # Disabling it -> No warning needed
                 clear_cache = False
              
-        elif choice == "6":
+        elif choice == "7":
             # Toggle Eager Mode
             use_eager = not use_eager
              
-        elif choice == "7":
+        elif choice == "8":
             # Launch
             break
             
@@ -284,9 +268,16 @@ def configure_and_launch(model_idx, gpu_count):
     env = os.environ.copy()
     env.update(config.get("env", {}))
     
+    if use_rocm_attn:
+        env["VLLM_V1_USE_PREFILL_DECODE_ATTENTION"] = "1"
+        env["VLLM_USE_TRITON_FLASH_ATTN"] = "0"
+        # Optional: Explicitly mention these in print
+        
+    
     print("\n" + "="*60)
     print(f" Launching: {name}")
     print(f" Config:    TP={current_tp} | Seqs={current_seqs} | Ctx={current_ctx} | Util={current_util}")
+    print(f" Backend:   {'ROCm' if use_rocm_attn else 'Triton'}")
     if clear_cache:
         print(f" Action:    Clearing vLLM Cache (~/.cache/vllm)")
     print(f" Command:   {' '.join(cmd)}")
