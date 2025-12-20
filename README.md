@@ -10,7 +10,7 @@ An **fedora-based** Docker/Podman container that is **Toolbx-compatible** (usabl
 
 * [Tested Models (Benchmarks)](#tested-models-benchmarks)
 * [1) Toolbx vs Docker/Podman](#1-toolbx-vs-dockerpodman)
-* [2) Quickstart — Fedora Toolbx (development)](#2-quickstart--fedora-toolbx-development)
+* [2) Quickstart — Fedora Toolbx](#2-quickstart--fedora-toolbx)
 * [3) Quickstart — Ubuntu (Distrobox)](#3-quickstart--ubuntu-distrobox)
 * [4) Testing the API](#4-testing-the-api)
 * [5) Use a Web UI for Chatting](#5-use-a-web-ui-for-chatting)
@@ -74,12 +74,12 @@ I have added the ability to switch between the default **Triton** backend and th
 
 The `kyuz0/vllm-therock-gfx1201:latest` image can be used both as: 
 
-* **Fedora Toolbx (recommended for development):** Toolbx shares your **HOME** and user, so models/configs live on the host. Great for iterating quickly while keeping the host clean. 
+* **Fedora Toolbx (recommended for development):** Toolbx shares your **HOME** and user, so models/configs live on the host. Great for iterating quickly while keeping the host clean. 
 * **Docker/Podman (recommended for deployment/perf):** Use for running vLLM as a service (host networking, IPC tuning, etc.). Always **mount a host directory** for model weights so they stay outside the container.
 
 ---
 
-## 2) Quickstart — Fedora Toolbx (development)
+## 2) Quickstart — Fedora Toolbx
 
 Create a toolbox that exposes the GPU and relaxes seccomp to avoid ROCm syscall issues:
 
