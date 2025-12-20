@@ -20,6 +20,8 @@ An **fedora-based** Docker/Podman container that is **Toolbx-compatible** (usabl
 
 View full benchmarks at: [https://kyuz0.github.io/amd-r9700-vllm-toolboxes/](https://kyuz0.github.io/amd-r9700-vllm-toolboxes/)
 
+*Run benchmarks now include a comparison between the default Triton backend and the optional ROCm attention backend.*
+
 
 **Table Key:** Cell values represent `Max Context Length (GPU Memory Utilization)`.
 
@@ -41,6 +43,29 @@ View full benchmarks at: [https://kyuz0.github.io/amd-r9700-vllm-toolboxes/](htt
 ### Advanced Tuning
 
 See [TUNING.md](TUNING.md) for a guide on how to enable undervolting and raise the power limit on AMD R9700 cards on Linux to improve performance and efficiency.
+
+### 🆕 Update: Comparison of Attention Backends (Triton vs ROCm)
+
+*Added Support for ROCm Native Attention Backend*
+
+I have added the ability to switch between the default **Triton** backend and the experimental **ROCm** native backend for attention operations. This provides you with more flexibility to optimize for stability or throughput depending on your specific model and workload.
+
+| Backend | Stability | Throughput | Compatibility |
+| :--- | :--- | :--- | :--- |
+| **Triton** (Default) | ✅ **High** | 🔸 Good | Works with all tested models |
+| **ROCm** | ⚠️ **Experimental** | 🚀 **Highest** | May fail with complex architectures |
+
+**Key Differences:**
+- **Triton**: The safe choice. It uses the Triton compiler to generate kernels and is the standard for vLLM on AMD.
+- **ROCm**: Uses composable kernel based attention. In my benchmarks, this often yields higher throughput (tokens/sec) but can be less stable, leading to crashes or "invalid graph" errors on some newer models.
+
+**How to Use:**
+1. **Easy Mode**: Select the backend in the `start-vllm` wizard (Item 5 in the menu).
+2. **Manual Mode**: Export the following environment variables before running `vllm serve`:
+   ```bash
+   export VLLM_V1_USE_PREFILL_DECODE_ATTENTION=1
+   export VLLM_USE_TRITON_FLASH_ATTN=0
+   ```
 
 
 ---
@@ -75,7 +100,7 @@ toolbox enter vllm-r9700
 
 ### Serving a Model (Easiest Way)
 
-The toolbox includes a TUI wizard called **`start-vllm`** which includes pre-configured models and handles the launch flags for you. This is the easiest way to get started.
+The toolbox includes a TUI wizard called **`start-vllm`** which includes pre-configured models and handles launch flags. It also allows you to select the experimental **ROCm attention backend**. This is the easiest way to get started.
 
 ```bash
 start-vllm
@@ -99,9 +124,8 @@ distrobox enter vllm-r9700
 
 > **Verification:** Run `rocm-smi` to check GPU status.
 
-### Serving a Model (Easiest Way)
-
-The toolbox includes a TUI wizard called **`start-vllm`** which includes pre-configured models and handles the launch flags for you. This is the easiest way to get started.
+### Serving a Model
+Same as above, you can use the **`start-vllm`** wizard to launch models easily.
 
 ```bash
 start-vllm
