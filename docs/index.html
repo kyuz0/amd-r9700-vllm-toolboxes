@@ -398,6 +398,33 @@
             border-bottom-color: var(--primary);
             font-weight: 600;
         }
+
+        /* Filter Checkboxes */
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 12px;
+            border-left: 1px solid var(--border);
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .check-item input[type="checkbox"] {
+            accent-color: var(--primary);
+        }
+
+        .check-item:hover {
+            color: var(--text-main);
+        }
     </style>
 </head>
 
@@ -424,6 +451,18 @@
             <select id="quantFilter">
                 <option value="">All Quantizations</option>
             </select>
+            <div class="filter-group">
+                <span style="font-size:0.8rem; font-weight:600; color:var(--text-muted); margin-right:6px;">GPUs:</span>
+                <label class="check-item"><input type="checkbox" id="chkTP1" checked> TP1</label>
+                <label class="check-item"><input type="checkbox" id="chkTP2" checked> TP2</label>
+            </div>
+
+            <div class="filter-group">
+                <span
+                    style="font-size:0.8rem; font-weight:600; color:var(--text-muted); margin-right:6px;">Attention:</span>
+                <label class="check-item"><input type="checkbox" id="chkTriton" checked> Triton</label>
+                <label class="check-item"><input type="checkbox" id="chkROCm"> ROCm</label>
+            </div>
         </div>
 
         <nav id="tabNav" class="tab-nav">
@@ -485,7 +524,13 @@
         let state = {
             search: "",
             quant: "",
-            activeTab: "Throughput"
+            activeTab: "Throughput",
+            view: {
+                tp1: true,
+                tp2: true,
+                triton: true,
+                rocm: false
+            }
         };
 
         // Benchmark Metadata
@@ -552,15 +597,23 @@
                         quant: run.quant,
                         params: run.params_b || run.name_params_b,
                         tp1: null,
-                        tp2: null
+                        tp1_rocm: null,
+                        tp2: null,
+                        tp2_rocm: null
                     };
                 }
 
                 const m = testGroups[run.test].models[modelName];
 
                 // Assign TP value
-                if (run.env === "TP1") m.tp1 = run.tps_mean;
-                if (run.env === "TP2") m.tp2 = run.tps_mean;
+                if (run.env === "TP1") {
+                    if (run.variant === "rocm") m.tp1_rocm = run.tps_mean;
+                    else m.tp1 = run.tps_mean;
+                }
+                if (run.env === "TP2") {
+                    if (run.variant === "rocm") m.tp2_rocm = run.tps_mean;
+                    else m.tp2 = run.tps_mean;
+                }
             });
 
             // Convert map to array for sorting
@@ -603,6 +656,18 @@
                 state.quant = e.target.value;
                 render();
             });
+
+            const bindCheck = (id, key) => {
+                $(id).addEventListener('change', e => {
+                    state.view[key] = e.target.checked;
+                    render();
+                });
+            };
+
+            bindCheck('chkTP1', 'tp1');
+            bindCheck('chkTP2', 'tp2');
+            bindCheck('chkTriton', 'triton');
+            bindCheck('chkROCm', 'rocm');
         }
 
         function getBenchmarkMeta(testName) {
@@ -700,13 +765,21 @@
 
             const table = document.createElement('table');
             const thead = document.createElement('thead');
-            thead.innerHTML = `
-            <tr>
-                <th class="col-model">Model</th>
-                <th class="col-data">TP1 (Single)</th>
-                <th class="col-data">TP2 (Dual)</th>
-            </tr>
-        `;
+
+            // Build dynamic headers
+            let headerHTML = '<tr><th class="col-model">Model</th>';
+
+            if (state.view.tp1) {
+                if (state.view.triton) headerHTML += '<th class="col-data">TP1<br><span style="font-weight:400; font-size:0.85em; text-transform:none;">Triton</span></th>';
+                if (state.view.rocm) headerHTML += '<th class="col-data" style="background:#fefce8;">TP1<br><span style="font-weight:400; font-size:0.85em; text-transform:none;">ROCm</span></th>';
+            }
+            if (state.view.tp2) {
+                if (state.view.triton) headerHTML += '<th class="col-data">TP2<br><span style="font-weight:400; font-size:0.85em; text-transform:none;">Triton</span></th>';
+                if (state.view.rocm) headerHTML += '<th class="col-data" style="background:#fefce8;">TP2<br><span style="font-weight:400; font-size:0.85em; text-transform:none;">ROCm</span></th>';
+            }
+
+            headerHTML += '</tr>';
+            thead.innerHTML = headerHTML;
             table.appendChild(thead);
 
             const tbody = document.createElement('tbody');
@@ -719,21 +792,26 @@
                 if (m.params) metaHtml += `<span class="tag">${m.params}B</span>`;
 
                 // Values
-                // Pass unit from meta
                 const unit = meta ? meta.unit : "";
-                const val1 = formatVal(m.tp1, unit);
-                const val2 = formatVal(m.tp2, unit);
 
-                tr.innerHTML = `
+                let rowHTML = `
                 <td>
                     <div class="model-cell">
                         <a href="https://huggingface.co/${m.name}" target="_blank" class="model-name" style="text-decoration: none; color: inherit; border-bottom: 1px dotted #ccc;">${m.name}</a>
                         <div class="model-meta">${metaHtml}</div>
                     </div>
-                </td>
-                <td class="col-data">${val1}</td>
-                <td class="col-data">${val2}</td>
-            `;
+                </td>`;
+
+                if (state.view.tp1) {
+                    if (state.view.triton) rowHTML += `<td class="col-data">${formatVal(m.tp1, unit)}</td>`;
+                    if (state.view.rocm) rowHTML += `<td class="col-data" style="background:#fffbeb;">${formatVal(m.tp1_rocm, unit)}</td>`;
+                }
+                if (state.view.tp2) {
+                    if (state.view.triton) rowHTML += `<td class="col-data">${formatVal(m.tp2, unit)}</td>`;
+                    if (state.view.rocm) rowHTML += `<td class="col-data" style="background:#fffbeb;">${formatVal(m.tp2_rocm, unit)}</td>`;
+                }
+
+                tr.innerHTML = rowHTML;
                 tbody.appendChild(tr);
             });
             table.appendChild(tbody);
@@ -744,8 +822,8 @@
         }
 
         function formatVal(v, unit) {
-            if (v === null || v === undefined) return '<span class="val-na">N/A</span>';
-            if (v === 0) return '<span class="val-na">FAIL</span>';
+            if (v === null || v === undefined) return '<span class="val-na" style="color:var(--text-muted); opacity:0.5;">X</span>';
+            if (v === 0) return '<span class="val-na" style="color:var(--primary); font-weight:600;">FAIL</span>';
             return `<span class="val">${v.toFixed(2)}<span style="font-size:0.8em; color:#888;">${unit}</span></span>`;
         }
 

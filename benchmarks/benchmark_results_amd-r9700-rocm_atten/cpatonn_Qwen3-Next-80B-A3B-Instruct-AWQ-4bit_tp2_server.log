@@ -1,0 +1,941 @@
+Skipping import of cpp extensions due to incompatible torch version 2.10.0a0+rocm7.11.0a20251210 for torchao version 0.14.1             Please see https://github.com/pytorch/ao/issues/2919 for more info
+WARNING 12-19 17:11:45 [attention.py:82] Using VLLM_V1_USE_PREFILL_DECODE_ATTENTION environment variable is deprecated and will be removed in v0.14.0 or v1.0.0, whichever is soonest. Please use --attention-config.use_prefill_decode_attention command line argument or AttentionConfig(use_prefill_decode_attention=...) config field instead.
+[0;36m(APIServer pid=76251)[0;0m INFO 12-19 17:11:45 [api_server.py:1351] vLLM API server version 0.13.0rc2.dev112+g763963aa7.d20251213
+[0;36m(APIServer pid=76251)[0;0m INFO 12-19 17:11:45 [utils.py:253] non-default args: {'model_tag': 'cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit', 'host': '127.0.0.1', 'model': 'cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit', 'trust_remote_code': True, 'max_model_len': 16384, 'tensor_parallel_size': 2, 'gpu_memory_utilization': 0.98, 'max_num_seqs': 32}
+[0;36m(APIServer pid=76251)[0;0m The argument `trust_remote_code` is to be used with Auto classes. It has no effect here and is ignored.
+[0;36m(APIServer pid=76251)[0;0m INFO 12-19 17:11:49 [model.py:514] Resolved architecture: Qwen3NextForCausalLM
+[0;36m(APIServer pid=76251)[0;0m INFO 12-19 17:11:49 [model.py:1636] Using max model len 16384
+[0;36m(APIServer pid=76251)[0;0m INFO 12-19 17:11:49 [scheduler.py:228] Chunked prefill is enabled with max_num_batched_tokens=2048.
+[0;36m(APIServer pid=76251)[0;0m INFO 12-19 17:11:49 [config.py:312] Disabling cascade attention since it is not supported for hybrid models.
+[0;36m(APIServer pid=76251)[0;0m INFO 12-19 17:11:49 [config.py:439] Setting attention block size to 544 tokens to ensure that attention page size is >= mamba page size.
+[0;36m(APIServer pid=76251)[0;0m INFO 12-19 17:11:49 [config.py:463] Padding mamba page size by 1.49% to ensure that mamba page size and attention page size are exactly equal.
+Skipping import of cpp extensions due to incompatible torch version 2.10.0a0+rocm7.11.0a20251210 for torchao version 0.14.1             Please see https://github.com/pytorch/ao/issues/2919 for more info
+[0;36m(EngineCore_DP0 pid=76413)[0;0m INFO 12-19 17:11:53 [core.py:93] Initializing a V1 LLM engine (v0.13.0rc2.dev112+g763963aa7.d20251213) with config: model='cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit', speculative_config=None, tokenizer='cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=True, dtype=torch.bfloat16, max_seq_len=16384, download_dir=None, load_format=auto, tensor_parallel_size=2, pipeline_parallel_size=1, data_parallel_size=1, disable_custom_all_reduce=True, quantization=compressed-tensors, enforce_eager=False, kv_cache_dtype=auto, device_config=cuda, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_fallback=False, disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, kv_cache_metrics=False, kv_cache_metrics_sample=0.01, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False), seed=0, served_model_name=cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit, enable_prefix_caching=False, enable_chunked_prefill=True, pooler_config=None, compilation_config={'level': None, 'mode': <CompilationMode.VLLM_COMPILE: 3>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'inductor', 'custom_ops': ['none'], 'splitting_ops': ['vllm::unified_attention', 'vllm::unified_attention_with_output', 'vllm::unified_mla_attention', 'vllm::unified_mla_attention_with_output', 'vllm::mamba_mixer2', 'vllm::mamba_mixer', 'vllm::short_conv', 'vllm::linear_attention', 'vllm::plamo2_mamba_mixer', 'vllm::gdn_attention_core', 'vllm::kda_attention', 'vllm::sparse_attn_indexer'], 'compile_mm_encoder': False, 'compile_sizes': [], 'compile_ranges_split_points': [2048], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.FULL_AND_PIECEWISE: (2, 1)>, 'cudagraph_num_of_warmups': 1, 'cudagraph_capture_sizes': [1, 2, 4, 8, 16, 24, 32, 40, 48, 56, 64], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': False, 'fuse_act_quant': False, 'fuse_attn_quant': False, 'eliminate_noops': True, 'enable_sp': False, 'fuse_gemm_comms': False, 'fuse_allreduce_rms': False}, 'max_cudagraph_capture_size': 64, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False}, 'local_cache_dir': None}
+[0;36m(EngineCore_DP0 pid=76413)[0;0m WARNING 12-19 17:11:53 [multiproc_executor.py:884] Reducing Torch parallelism from 24 threads to 1 to avoid unnecessary CPU contention. Set OMP_NUM_THREADS in the external environment to tune this value as needed.
+Skipping import of cpp extensions due to incompatible torch version 2.10.0a0+rocm7.11.0a20251210 for torchao version 0.14.1             Please see https://github.com/pytorch/ao/issues/2919 for more info
+Skipping import of cpp extensions due to incompatible torch version 2.10.0a0+rocm7.11.0a20251210 for torchao version 0.14.1             Please see https://github.com/pytorch/ao/issues/2919 for more info
+INFO 12-19 17:11:56 [parallel_state.py:1203] world_size=2 rank=0 local_rank=0 distributed_init_method=tcp://127.0.0.1:50157 backend=nccl
+INFO 12-19 17:11:56 [parallel_state.py:1203] world_size=2 rank=1 local_rank=1 distributed_init_method=tcp://127.0.0.1:50157 backend=nccl
+INFO 12-19 17:11:57 [pynccl.py:111] vLLM is using nccl==2.27.3
+INFO 12-19 17:11:57 [parallel_state.py:1411] rank 1 in world size 2 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 1, EP rank 1
+INFO 12-19 17:11:57 [parallel_state.py:1411] rank 0 in world size 2 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, EP rank 0
+[0;36m(Worker_TP0 pid=76495)[0;0m INFO 12-19 17:11:58 [gpu_model_runner.py:3562] Starting to load model cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit...
+[0;36m(Worker_TP1 pid=76496)[0;0m WARNING 12-19 17:11:58 [compressed_tensors.py:742] Acceleration for non-quantized schemes is not supported by Compressed Tensors. Falling back to UnquantizedLinearMethod
+[0;36m(Worker_TP1 pid=76496)[0;0m INFO 12-19 17:11:58 [layer.py:372] Enabled separate cuda stream for MoE shared_experts
+[0;36m(Worker_TP1 pid=76496)[0;0m INFO 12-19 17:11:58 [compressed_tensors_moe.py:188] Using CompressedTensorsWNA16MoEMethod
+[0;36m(Worker_TP0 pid=76495)[0;0m WARNING 12-19 17:11:58 [compressed_tensors.py:742] Acceleration for non-quantized schemes is not supported by Compressed Tensors. Falling back to UnquantizedLinearMethod
+[0;36m(Worker_TP0 pid=76495)[0;0m INFO 12-19 17:11:58 [layer.py:372] Enabled separate cuda stream for MoE shared_experts
+[0;36m(Worker_TP0 pid=76495)[0;0m INFO 12-19 17:11:58 [compressed_tensors_moe.py:188] Using CompressedTensorsWNA16MoEMethod
+[0;36m(Worker_TP1 pid=76496)[0;0m INFO 12-19 17:11:58 [rocm.py:306] Using Rocm Attention backend on V1 engine.
+[0;36m(Worker_TP0 pid=76495)[0;0m INFO 12-19 17:11:58 [rocm.py:306] Using Rocm Attention backend on V1 engine.
+[0;36m(Worker_TP0 pid=76495)[0;0m Loading safetensors checkpoint shards:   0% Completed | 0/10 [00:00<?, ?it/s]
+[0;36m(Worker_TP0 pid=76495)[0;0m Loading safetensors checkpoint shards:  10% Completed | 1/10 [00:03<00:32,  3.65s/it]
+[0;36m(Worker_TP0 pid=76495)[0;0m Loading safetensors checkpoint shards:  20% Completed | 2/10 [00:07<00:29,  3.64s/it]
+[0;36m(Worker_TP0 pid=76495)[0;0m Loading safetensors checkpoint shards:  30% Completed | 3/10 [00:11<00:26,  3.79s/it]
+[0;36m(Worker_TP0 pid=76495)[0;0m Loading safetensors checkpoint shards:  40% Completed | 4/10 [00:15<00:23,  3.97s/it]
+[0;36m(Worker_TP0 pid=76495)[0;0m Loading safetensors checkpoint shards:  50% Completed | 5/10 [00:18<00:18,  3.76s/it]
+[0;36m(Worker_TP0 pid=76495)[0;0m Loading safetensors checkpoint shards:  60% Completed | 6/10 [00:22<00:15,  3.85s/it]
+[0;36m(Worker_TP0 pid=76495)[0;0m Loading safetensors checkpoint shards:  70% Completed | 7/10 [00:26<00:11,  3.83s/it]
+[0;36m(Worker_TP0 pid=76495)[0;0m Loading safetensors checkpoint shards:  80% Completed | 8/10 [00:30<00:07,  3.84s/it]
+[0;36m(Worker_TP0 pid=76495)[0;0m Loading safetensors checkpoint shards: 100% Completed | 10/10 [00:34<00:00,  2.97s/it]
+[0;36m(Worker_TP0 pid=76495)[0;0m Loading safetensors checkpoint shards: 100% Completed | 10/10 [00:34<00:00,  3.46s/it]
+[0;36m(Worker_TP0 pid=76495)[0;0m 
+[0;36m(Worker_TP0 pid=76495)[0;0m INFO 12-19 17:12:33 [default_loader.py:308] Loading weights took 34.64 seconds
+[0;36m(Worker_TP0 pid=76495)[0;0m INFO 12-19 17:12:34 [gpu_model_runner.py:3659] Model loading took 23.5020 GiB memory and 35.701153 seconds
+[0;36m(Worker_TP0 pid=76495)[0;0m INFO 12-19 17:12:38 [backends.py:634] Using cache directory: /home/kyuz0/.cache/vllm/torch_compile_cache/671837fea6/rank_0_0/backbone for vLLM's torch.compile
+[0;36m(Worker_TP0 pid=76495)[0;0m INFO 12-19 17:12:38 [backends.py:694] Dynamo bytecode transform time: 4.08 s
+[0;36m(Worker_TP1 pid=76496)[0;0m INFO 12-19 17:12:40 [backends.py:261] Cache the graph of compile range (1, 2048) for later use
+[0;36m(Worker_TP0 pid=76495)[0;0m INFO 12-19 17:12:40 [backends.py:261] Cache the graph of compile range (1, 2048) for later use
+[0;36m(Worker_TP1 pid=76496)[0;0m WARNING 12-19 17:12:41 [fused_moe.py:888] Using default MoE config. Performance might be sub-optimal! Config file not found at ['/opt/venv/lib/python3.13/site-packages/vllm/model_executor/layers/fused_moe/configs/E=512,N=256,device_name=AMD-gfx1201,dtype=int4_w4a16.json']
+[0;36m(Worker_TP0 pid=76495)[0;0m WARNING 12-19 17:12:41 [fused_moe.py:888] Using default MoE config. Performance might be sub-optimal! Config file not found at ['/opt/venv/lib/python3.13/site-packages/vllm/model_executor/layers/fused_moe/configs/E=512,N=256,device_name=AMD-gfx1201,dtype=int4_w4a16.json']
+[0;36m(Worker_TP0 pid=76495)[0;0m INFO 12-19 17:12:43 [backends.py:278] Compiling a graph for compile range (1, 2048) takes 2.59 s
+[0;36m(Worker_TP0 pid=76495)[0;0m INFO 12-19 17:12:43 [monitor.py:34] torch.compile takes 6.67 s in total
+[0;36m(Worker_TP1 pid=76496)[0;0m WARNING 12-19 17:12:43 [decorators.py:528] Cannot save aot compilation to path /home/kyuz0/.cache/vllm/torch_aot_compile/8cfc5b4a85b0195581f74785744c13daeda3dd4bc8885cc84b5001d538a63819/rank_1_0/model, error: 
+[0;36m(Worker_TP0 pid=76495)[0;0m WARNING 12-19 17:12:43 [decorators.py:528] Cannot save aot compilation to path /home/kyuz0/.cache/vllm/torch_aot_compile/8cfc5b4a85b0195581f74785744c13daeda3dd4bc8885cc84b5001d538a63819/rank_0_0/model, error: 
+[0;36m(Worker_TP0 pid=76495)[0;0m INFO 12-19 17:12:44 [gpu_worker.py:375] Available KV cache memory: 7.09 GiB
+[0;36m(EngineCore_DP0 pid=76413)[0;0m INFO 12-19 17:12:45 [kv_cache_utils.py:1291] GPU KV cache size: 154,496 tokens
+[0;36m(EngineCore_DP0 pid=76413)[0;0m INFO 12-19 17:12:45 [kv_cache_utils.py:1296] Maximum concurrency for 16,384 tokens per request: 33.47x
+[0;36m(Worker_TP0 pid=76495)[0;0m Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):   0%|          | 0/11 [00:00<?, ?it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):   9%|▉         | 1/11 [00:00<00:05,  1.95it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  18%|█▊        | 2/11 [00:01<00:04,  1.83it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  27%|██▋       | 3/11 [00:01<00:04,  1.91it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  36%|███▋      | 4/11 [00:02<00:03,  1.93it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  45%|████▌     | 5/11 [00:02<00:03,  1.95it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  55%|█████▍    | 6/11 [00:03<00:02,  1.95it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  64%|██████▎   | 7/11 [00:03<00:02,  1.97it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  73%|███████▎  | 8/11 [00:04<00:01,  1.98it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  82%|████████▏ | 9/11 [00:04<00:01,  1.95it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  91%|█████████ | 10/11 [00:05<00:00,  1.92it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE): 100%|██████████| 11/11 [00:05<00:00,  1.98it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE): 100%|██████████| 11/11 [00:05<00:00,  1.95it/s]
+[0;36m(Worker_TP0 pid=76495)[0;0m Capturing CUDA graphs (decode, FULL):   0%|          | 0/7 [00:00<?, ?it/s]Capturing CUDA graphs (decode, FULL):   0%|          | 0/7 [00:00<?, ?it/s]
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] WorkerProc hit an exception.
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] Traceback (most recent call last):
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/language/core.py", line 43, in wrapper
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return fn(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/language/core.py", line 1638, in arange
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return _semantic.arange(start, end)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/language/semantic.py", line 583, in arange
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     raise ValueError("arange's range must be a power of 2")
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] ValueError: arange's range must be a power of 2
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] The above exception was the direct cause of the following exception:
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] Traceback (most recent call last):
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/executor/multiproc_executor.py", line 821, in worker_busy_loop
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     output = func(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/worker/gpu_worker.py", line 459, in compile_or_warm_up_model
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     cuda_graph_memory_bytes = self.model_runner.capture_model()
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4586, in capture_model
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     self._capture_cudagraphs(
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~~~~~~~~~~^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         compilation_cases=compilation_cases_decode,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         cudagraph_runtime_mode=CUDAGraphMode.FULL,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         uniform_decode=True,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4664, in _capture_cudagraphs
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     self._dummy_run(
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         num_tokens,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<6 lines>...
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         activate_lora=activate_lora,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return func(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4198, in _dummy_run
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     outputs = self.model(
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         input_ids=input_ids,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<3 lines>...
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         **model_kwargs,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/compilation/cuda_graph.py", line 220, in __call__
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self.runnable(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._call_impl(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return forward_call(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/model_executor/models/qwen3_next.py", line 1231, in forward
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     hidden_states = self.model(
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         input_ids, positions, intermediate_tensors, inputs_embeds
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/compilation/decorators.py", line 376, in __call__
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self.aot_compiled_fn(self, *args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/_dynamo/aot_compile.py", line 124, in __call__
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self.fn(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/model_executor/models/qwen3_next.py", line 997, in forward
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     def forward(
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/compilation/caching.py", line 54, in __call__
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self.optimized_call(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 936, in call_wrapped
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._wrapped_call(self, *args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 455, in __call__
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     raise e
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 442, in __call__
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return super(self.cls, obj).__call__(*args, **kwargs)  # type: ignore[misc]
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._call_impl(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return forward_call(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "<eval_with_key>.99", line 333, in forward
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     submod_7 = self.submod_7(getitem_21, s72, getitem_22, getitem_23, getitem_24);  getitem_21 = getitem_22 = getitem_23 = submod_7 = None
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 936, in call_wrapped
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._wrapped_call(self, *args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 455, in __call__
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     raise e
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 442, in __call__
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return super(self.cls, obj).__call__(*args, **kwargs)  # type: ignore[misc]
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._call_impl(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return forward_call(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "<eval_with_key>.107", line 5, in forward
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     unified_attention_with_output = torch.ops.vllm.unified_attention_with_output(query_8, key_8, value_9, output_5, 'model.layers.3.self_attn.attn');  query_8 = key_8 = value_9 = output_5 = unified_attention_with_output = None
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/_ops.py", line 1209, in __call__
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._op(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/attention/utils/kv_transfer_utils.py", line 39, in wrapper
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return func(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/attention/layer.py", line 923, in unified_attention_with_output
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     self.impl.forward(
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~~~^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         self,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<7 lines>...
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         output_block_scale=output_block_scale,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/attention/backends/rocm_attn.py", line 337, in forward
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     chunked_prefill_paged_decode(
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         query=query[:num_actual_tokens],
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<17 lines>...
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         sinks=self.sinks,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/attention/ops/chunked_prefill_paged_decode.py", line 356, in chunked_prefill_paged_decode
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     kernel_paged_attention_2d[
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~~~~~~~~~~~~
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<3 lines>...
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         )
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ~
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ](
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         output_ptr=output,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<37 lines>...
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         USE_FP8=output_scale is not None,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/runtime/jit.py", line 419, in <lambda>
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return lambda *args, **kwargs: self.run(grid=grid, warmup=False, *args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]                                    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/runtime/jit.py", line 733, in run
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     kernel = self._do_compile(key, signature, device, constexprs, options, attrs, warmup)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/runtime/jit.py", line 861, in _do_compile
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     kernel = self.compile(src, target=target, options=options.__dict__)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/compiler/compiler.py", line 300, in compile
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     module = src.make_ir(target, options, codegen_fns, module_map, context)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/compiler/compiler.py", line 80, in make_ir
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return ast_to_ttir(self.fn, self, context=context, options=options, codegen_fns=codegen_fns,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]                        module_map=module_map)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] triton.compiler.errors.CompilationError: at 106:17:
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     if USE_ALIBI_SLOPES:
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         alibi_slope = tl.load(
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]             alibi_slopes_ptr + query_head_idx, mask=head_mask, other=0.0
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         )
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     num_blocks = cdiv_fn(seq_len, BLOCK_SIZE)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     # iterate through tiles
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     for j in range(0, num_blocks):
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         physical_block_idx = tl.load(block_tables_ptr + block_table_offset + j)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         offs_n = tl.arange(0, BLOCK_SIZE)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]                  ^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] arange's range must be a power of 2
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] Traceback (most recent call last):
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/language/core.py", line 43, in wrapper
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return fn(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/language/core.py", line 1638, in arange
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return _semantic.arange(start, end)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/language/semantic.py", line 583, in arange
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     raise ValueError("arange's range must be a power of 2")
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] ValueError: arange's range must be a power of 2
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] The above exception was the direct cause of the following exception:
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] Traceback (most recent call last):
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/executor/multiproc_executor.py", line 821, in worker_busy_loop
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     output = func(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/worker/gpu_worker.py", line 459, in compile_or_warm_up_model
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     cuda_graph_memory_bytes = self.model_runner.capture_model()
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4586, in capture_model
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     self._capture_cudagraphs(
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~~~~~~~~~~^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         compilation_cases=compilation_cases_decode,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         cudagraph_runtime_mode=CUDAGraphMode.FULL,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         uniform_decode=True,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4664, in _capture_cudagraphs
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     self._dummy_run(
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         num_tokens,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<6 lines>...
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         activate_lora=activate_lora,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return func(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4198, in _dummy_run
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     outputs = self.model(
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         input_ids=input_ids,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<3 lines>...
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         **model_kwargs,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/compilation/cuda_graph.py", line 220, in __call__
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self.runnable(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._call_impl(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return forward_call(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/model_executor/models/qwen3_next.py", line 1231, in forward
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     hidden_states = self.model(
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         input_ids, positions, intermediate_tensors, inputs_embeds
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/compilation/decorators.py", line 376, in __call__
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self.aot_compiled_fn(self, *args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/_dynamo/aot_compile.py", line 124, in __call__
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self.fn(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/model_executor/models/qwen3_next.py", line 997, in forward
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     def forward(
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/compilation/caching.py", line 54, in __call__
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self.optimized_call(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 936, in call_wrapped
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._wrapped_call(self, *args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 455, in __call__
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     raise e
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 442, in __call__
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return super(self.cls, obj).__call__(*args, **kwargs)  # type: ignore[misc]
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._call_impl(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return forward_call(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "<eval_with_key>.99", line 333, in forward
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     submod_7 = self.submod_7(getitem_21, s72, getitem_22, getitem_23, getitem_24);  getitem_21 = getitem_22 = getitem_23 = submod_7 = None
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 936, in call_wrapped
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._wrapped_call(self, *args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 455, in __call__
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     raise e
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 442, in __call__
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return super(self.cls, obj).__call__(*args, **kwargs)  # type: ignore[misc]
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._call_impl(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return forward_call(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "<eval_with_key>.107", line 5, in forward
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     unified_attention_with_output = torch.ops.vllm.unified_attention_with_output(query_8, key_8, value_9, output_5, 'model.layers.3.self_attn.attn');  query_8 = key_8 = value_9 = output_5 = unified_attention_with_output = None
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/_ops.py", line 1209, in __call__
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._op(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/attention/utils/kv_transfer_utils.py", line 39, in wrapper
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return func(*args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/attention/layer.py", line 923, in unified_attention_with_output
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     self.impl.forward(
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~~~^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         self,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<7 lines>...
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         output_block_scale=output_block_scale,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/attention/backends/rocm_attn.py", line 337, in forward
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     chunked_prefill_paged_decode(
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         query=query[:num_actual_tokens],
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<17 lines>...
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         sinks=self.sinks,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/attention/ops/chunked_prefill_paged_decode.py", line 356, in chunked_prefill_paged_decode
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     kernel_paged_attention_2d[
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~~~~~~~~~~~~
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<3 lines>...
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         )
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ~
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ](
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         output_ptr=output,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<37 lines>...
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         USE_FP8=output_scale is not None,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/runtime/jit.py", line 419, in <lambda>
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return lambda *args, **kwargs: self.run(grid=grid, warmup=False, *args, **kwargs)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]                                    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/runtime/jit.py", line 733, in run
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     kernel = self._do_compile(key, signature, device, constexprs, options, attrs, warmup)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/runtime/jit.py", line 861, in _do_compile
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     kernel = self.compile(src, target=target, options=options.__dict__)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/compiler/compiler.py", line 300, in compile
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     module = src.make_ir(target, options, codegen_fns, module_map, context)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/compiler/compiler.py", line 80, in make_ir
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return ast_to_ttir(self.fn, self, context=context, options=options, codegen_fns=codegen_fns,
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]                        module_map=module_map)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] triton.compiler.errors.CompilationError: at 106:17:
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     if USE_ALIBI_SLOPES:
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         alibi_slope = tl.load(
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]             alibi_slopes_ptr + query_head_idx, mask=head_mask, other=0.0
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         )
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     num_blocks = cdiv_fn(seq_len, BLOCK_SIZE)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     # iterate through tiles
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     for j in range(0, num_blocks):
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         physical_block_idx = tl.load(block_tables_ptr + block_table_offset + j)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         offs_n = tl.arange(0, BLOCK_SIZE)
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]                  ^
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] arange's range must be a power of 2
+[0;36m(Worker_TP1 pid=76496)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] WorkerProc hit an exception.
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] Traceback (most recent call last):
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/language/core.py", line 43, in wrapper
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return fn(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/language/core.py", line 1638, in arange
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return _semantic.arange(start, end)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/language/semantic.py", line 583, in arange
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     raise ValueError("arange's range must be a power of 2")
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] ValueError: arange's range must be a power of 2
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] The above exception was the direct cause of the following exception:
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] Traceback (most recent call last):
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/executor/multiproc_executor.py", line 821, in worker_busy_loop
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     output = func(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/worker/gpu_worker.py", line 459, in compile_or_warm_up_model
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     cuda_graph_memory_bytes = self.model_runner.capture_model()
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4586, in capture_model
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     self._capture_cudagraphs(
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~~~~~~~~~~^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         compilation_cases=compilation_cases_decode,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         cudagraph_runtime_mode=CUDAGraphMode.FULL,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         uniform_decode=True,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4664, in _capture_cudagraphs
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     self._dummy_run(
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         num_tokens,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<6 lines>...
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         activate_lora=activate_lora,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return func(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4198, in _dummy_run
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     outputs = self.model(
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         input_ids=input_ids,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<3 lines>...
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         **model_kwargs,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/compilation/cuda_graph.py", line 220, in __call__
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self.runnable(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._call_impl(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return forward_call(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/model_executor/models/qwen3_next.py", line 1231, in forward
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     hidden_states = self.model(
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         input_ids, positions, intermediate_tensors, inputs_embeds
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/compilation/decorators.py", line 376, in __call__
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self.aot_compiled_fn(self, *args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/_dynamo/aot_compile.py", line 124, in __call__
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self.fn(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/model_executor/models/qwen3_next.py", line 997, in forward
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     def forward(
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/compilation/caching.py", line 54, in __call__
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self.optimized_call(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 936, in call_wrapped
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._wrapped_call(self, *args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 455, in __call__
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     raise e
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 442, in __call__
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return super(self.cls, obj).__call__(*args, **kwargs)  # type: ignore[misc]
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._call_impl(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return forward_call(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "<eval_with_key>.99", line 333, in forward
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     submod_7 = self.submod_7(getitem_21, s72, getitem_22, getitem_23, getitem_24);  getitem_21 = getitem_22 = getitem_23 = submod_7 = None
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 936, in call_wrapped
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._wrapped_call(self, *args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 455, in __call__
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     raise e
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 442, in __call__
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return super(self.cls, obj).__call__(*args, **kwargs)  # type: ignore[misc]
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._call_impl(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return forward_call(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "<eval_with_key>.107", line 5, in forward
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     unified_attention_with_output = torch.ops.vllm.unified_attention_with_output(query_8, key_8, value_9, output_5, 'model.layers.3.self_attn.attn');  query_8 = key_8 = value_9 = output_5 = unified_attention_with_output = None
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/_ops.py", line 1209, in __call__
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._op(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/attention/utils/kv_transfer_utils.py", line 39, in wrapper
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return func(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/attention/layer.py", line 923, in unified_attention_with_output
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     self.impl.forward(
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~~~^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         self,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<7 lines>...
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         output_block_scale=output_block_scale,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/attention/backends/rocm_attn.py", line 337, in forward
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     chunked_prefill_paged_decode(
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         query=query[:num_actual_tokens],
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<17 lines>...
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         sinks=self.sinks,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/attention/ops/chunked_prefill_paged_decode.py", line 356, in chunked_prefill_paged_decode
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     kernel_paged_attention_2d[
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~~~~~~~~~~~~
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<3 lines>...
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         )
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ~
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ](
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         output_ptr=output,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<37 lines>...
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         USE_FP8=output_scale is not None,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/runtime/jit.py", line 419, in <lambda>
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return lambda *args, **kwargs: self.run(grid=grid, warmup=False, *args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]                                    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/runtime/jit.py", line 733, in run
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     kernel = self._do_compile(key, signature, device, constexprs, options, attrs, warmup)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/runtime/jit.py", line 861, in _do_compile
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     kernel = self.compile(src, target=target, options=options.__dict__)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/compiler/compiler.py", line 300, in compile
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     module = src.make_ir(target, options, codegen_fns, module_map, context)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/compiler/compiler.py", line 80, in make_ir
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return ast_to_ttir(self.fn, self, context=context, options=options, codegen_fns=codegen_fns,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]                        module_map=module_map)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] triton.compiler.errors.CompilationError: at 106:17:
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     if USE_ALIBI_SLOPES:
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         alibi_slope = tl.load(
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]             alibi_slopes_ptr + query_head_idx, mask=head_mask, other=0.0
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         )
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     num_blocks = cdiv_fn(seq_len, BLOCK_SIZE)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     # iterate through tiles
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     for j in range(0, num_blocks):
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         physical_block_idx = tl.load(block_tables_ptr + block_table_offset + j)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         offs_n = tl.arange(0, BLOCK_SIZE)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]                  ^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] arange's range must be a power of 2
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] Traceback (most recent call last):
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/language/core.py", line 43, in wrapper
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return fn(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/language/core.py", line 1638, in arange
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return _semantic.arange(start, end)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/language/semantic.py", line 583, in arange
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     raise ValueError("arange's range must be a power of 2")
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] ValueError: arange's range must be a power of 2
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] The above exception was the direct cause of the following exception:
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] Traceback (most recent call last):
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/executor/multiproc_executor.py", line 821, in worker_busy_loop
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     output = func(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/worker/gpu_worker.py", line 459, in compile_or_warm_up_model
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     cuda_graph_memory_bytes = self.model_runner.capture_model()
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4586, in capture_model
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     self._capture_cudagraphs(
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~~~~~~~~~~^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         compilation_cases=compilation_cases_decode,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         cudagraph_runtime_mode=CUDAGraphMode.FULL,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         uniform_decode=True,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4664, in _capture_cudagraphs
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     self._dummy_run(
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         num_tokens,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<6 lines>...
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         activate_lora=activate_lora,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return func(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4198, in _dummy_run
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     outputs = self.model(
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         input_ids=input_ids,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<3 lines>...
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         **model_kwargs,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/compilation/cuda_graph.py", line 220, in __call__
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self.runnable(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._call_impl(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return forward_call(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/model_executor/models/qwen3_next.py", line 1231, in forward
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     hidden_states = self.model(
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         input_ids, positions, intermediate_tensors, inputs_embeds
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/compilation/decorators.py", line 376, in __call__
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self.aot_compiled_fn(self, *args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/_dynamo/aot_compile.py", line 124, in __call__
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self.fn(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/model_executor/models/qwen3_next.py", line 997, in forward
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     def forward(
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/compilation/caching.py", line 54, in __call__
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self.optimized_call(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 936, in call_wrapped
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._wrapped_call(self, *args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 455, in __call__
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     raise e
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 442, in __call__
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return super(self.cls, obj).__call__(*args, **kwargs)  # type: ignore[misc]
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._call_impl(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return forward_call(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "<eval_with_key>.99", line 333, in forward
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     submod_7 = self.submod_7(getitem_21, s72, getitem_22, getitem_23, getitem_24);  getitem_21 = getitem_22 = getitem_23 = submod_7 = None
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 936, in call_wrapped
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._wrapped_call(self, *args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 455, in __call__
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     raise e
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/fx/graph_module.py", line 442, in __call__
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return super(self.cls, obj).__call__(*args, **kwargs)  # type: ignore[misc]
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._call_impl(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return forward_call(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "<eval_with_key>.107", line 5, in forward
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     unified_attention_with_output = torch.ops.vllm.unified_attention_with_output(query_8, key_8, value_9, output_5, 'model.layers.3.self_attn.attn');  query_8 = key_8 = value_9 = output_5 = unified_attention_with_output = None
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/torch/_ops.py", line 1209, in __call__
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return self._op(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]            ~~~~~~~~^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/attention/utils/kv_transfer_utils.py", line 39, in wrapper
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return func(*args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/attention/layer.py", line 923, in unified_attention_with_output
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     self.impl.forward(
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~~~^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         self,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<7 lines>...
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         output_block_scale=output_block_scale,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/attention/backends/rocm_attn.py", line 337, in forward
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     chunked_prefill_paged_decode(
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         query=query[:num_actual_tokens],
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<17 lines>...
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         sinks=self.sinks,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/vllm/attention/ops/chunked_prefill_paged_decode.py", line 356, in chunked_prefill_paged_decode
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     kernel_paged_attention_2d[
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~~~~~~~~~~~~~~~~~~~~~~~~~~
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<3 lines>...
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         )
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ~
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ](
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ~^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         output_ptr=output,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ...<37 lines>...
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         USE_FP8=output_scale is not None,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     )
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     ^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/runtime/jit.py", line 419, in <lambda>
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return lambda *args, **kwargs: self.run(grid=grid, warmup=False, *args, **kwargs)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]                                    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/runtime/jit.py", line 733, in run
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     kernel = self._do_compile(key, signature, device, constexprs, options, attrs, warmup)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/runtime/jit.py", line 861, in _do_compile
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     kernel = self.compile(src, target=target, options=options.__dict__)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/compiler/compiler.py", line 300, in compile
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     module = src.make_ir(target, options, codegen_fns, module_map, context)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]   File "/opt/venv/lib64/python3.13/site-packages/triton/compiler/compiler.py", line 80, in make_ir
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     return ast_to_ttir(self.fn, self, context=context, options=options, codegen_fns=codegen_fns,
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]                        module_map=module_map)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] triton.compiler.errors.CompilationError: at 106:17:
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     if USE_ALIBI_SLOPES:
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         alibi_slope = tl.load(
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]             alibi_slopes_ptr + query_head_idx, mask=head_mask, other=0.0
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         )
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     num_blocks = cdiv_fn(seq_len, BLOCK_SIZE)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     # iterate through tiles
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]     for j in range(0, num_blocks):
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         physical_block_idx = tl.load(block_tables_ptr + block_table_offset + j)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]         offs_n = tl.arange(0, BLOCK_SIZE)
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826]                  ^
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] arange's range must be a power of 2
+[0;36m(Worker_TP0 pid=76495)[0;0m ERROR 12-19 17:12:51 [multiproc_executor.py:826] 
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866] EngineCore failed to start.
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866] Traceback (most recent call last):
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/engine/core.py", line 857, in run_engine_core
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     engine_core = EngineCoreProc(*args, **kwargs)
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/engine/core.py", line 637, in __init__
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     super().__init__(
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     ~~~~~~~~~~~~~~~~^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]         vllm_config, executor_class, log_stats, executor_fail_callback
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     )
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     ^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/engine/core.py", line 109, in __init__
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     num_gpu_blocks, num_cpu_blocks, kv_cache_config = self._initialize_kv_caches(
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]         vllm_config
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]         ^^^^^^^^^^^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     )
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     ^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/engine/core.py", line 256, in _initialize_kv_caches
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     self.model_executor.initialize_from_config(kv_cache_configs)
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/executor/abstract.py", line 116, in initialize_from_config
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     self.collective_rpc("compile_or_warm_up_model")
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/executor/multiproc_executor.py", line 361, in collective_rpc
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     return aggregate(get_response())
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]                      ~~~~~~~~~~~~^^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/executor/multiproc_executor.py", line 344, in get_response
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     raise RuntimeError(
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     ...<2 lines>...
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     )
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866] RuntimeError: Worker failed with error 'at 106:17:
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     if USE_ALIBI_SLOPES:
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]         alibi_slope = tl.load(
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]             alibi_slopes_ptr + query_head_idx, mask=head_mask, other=0.0
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]         )
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866] 
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     num_blocks = cdiv_fn(seq_len, BLOCK_SIZE)
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866] 
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     # iterate through tiles
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]     for j in range(0, num_blocks):
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]         physical_block_idx = tl.load(block_tables_ptr + block_table_offset + j)
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866] 
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]         offs_n = tl.arange(0, BLOCK_SIZE)
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866]                  ^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m ERROR 12-19 17:12:51 [core.py:866] arange's range must be a power of 2', please check the stack trace above for the root cause
+[0;36m(EngineCore_DP0 pid=76413)[0;0m Process EngineCore_DP0:
+[0;36m(EngineCore_DP0 pid=76413)[0;0m Traceback (most recent call last):
+[0;36m(EngineCore_DP0 pid=76413)[0;0m   File "/usr/lib64/python3.13/multiprocessing/process.py", line 313, in _bootstrap
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     self.run()
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     ~~~~~~~~^^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m   File "/usr/lib64/python3.13/multiprocessing/process.py", line 108, in run
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     self._target(*self._args, **self._kwargs)
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/engine/core.py", line 870, in run_engine_core
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     raise e
+[0;36m(EngineCore_DP0 pid=76413)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/engine/core.py", line 857, in run_engine_core
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     engine_core = EngineCoreProc(*args, **kwargs)
+[0;36m(EngineCore_DP0 pid=76413)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/engine/core.py", line 637, in __init__
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     super().__init__(
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     ~~~~~~~~~~~~~~~~^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m         vllm_config, executor_class, log_stats, executor_fail_callback
+[0;36m(EngineCore_DP0 pid=76413)[0;0m         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     )
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     ^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/engine/core.py", line 109, in __init__
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     num_gpu_blocks, num_cpu_blocks, kv_cache_config = self._initialize_kv_caches(
+[0;36m(EngineCore_DP0 pid=76413)[0;0m                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m         vllm_config
+[0;36m(EngineCore_DP0 pid=76413)[0;0m         ^^^^^^^^^^^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     )
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     ^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/engine/core.py", line 256, in _initialize_kv_caches
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     self.model_executor.initialize_from_config(kv_cache_configs)
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/executor/abstract.py", line 116, in initialize_from_config
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     self.collective_rpc("compile_or_warm_up_model")
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/executor/multiproc_executor.py", line 361, in collective_rpc
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     return aggregate(get_response())
+[0;36m(EngineCore_DP0 pid=76413)[0;0m                      ~~~~~~~~~~~~^^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/executor/multiproc_executor.py", line 344, in get_response
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     raise RuntimeError(
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     ...<2 lines>...
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     )
+[0;36m(EngineCore_DP0 pid=76413)[0;0m RuntimeError: Worker failed with error 'at 106:17:
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     if USE_ALIBI_SLOPES:
+[0;36m(EngineCore_DP0 pid=76413)[0;0m         alibi_slope = tl.load(
+[0;36m(EngineCore_DP0 pid=76413)[0;0m             alibi_slopes_ptr + query_head_idx, mask=head_mask, other=0.0
+[0;36m(EngineCore_DP0 pid=76413)[0;0m         )
+[0;36m(EngineCore_DP0 pid=76413)[0;0m 
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     num_blocks = cdiv_fn(seq_len, BLOCK_SIZE)
+[0;36m(EngineCore_DP0 pid=76413)[0;0m 
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     # iterate through tiles
+[0;36m(EngineCore_DP0 pid=76413)[0;0m     for j in range(0, num_blocks):
+[0;36m(EngineCore_DP0 pid=76413)[0;0m         physical_block_idx = tl.load(block_tables_ptr + block_table_offset + j)
+[0;36m(EngineCore_DP0 pid=76413)[0;0m 
+[0;36m(EngineCore_DP0 pid=76413)[0;0m         offs_n = tl.arange(0, BLOCK_SIZE)
+[0;36m(EngineCore_DP0 pid=76413)[0;0m                  ^
+[0;36m(EngineCore_DP0 pid=76413)[0;0m arange's range must be a power of 2', please check the stack trace above for the root cause
+[0;36m(Worker_TP0 pid=76495)[0;0m INFO 12-19 17:12:51 [multiproc_executor.py:711] Parent process exited, terminating worker
+[0;36m(Worker_TP1 pid=76496)[0;0m INFO 12-19 17:12:51 [multiproc_executor.py:711] Parent process exited, terminating worker
+[0;36m(APIServer pid=76251)[0;0m Traceback (most recent call last):
+[0;36m(APIServer pid=76251)[0;0m   File "/opt/venv/bin/vllm", line 7, in <module>
+[0;36m(APIServer pid=76251)[0;0m     sys.exit(main())
+[0;36m(APIServer pid=76251)[0;0m              ~~~~^^
+[0;36m(APIServer pid=76251)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/entrypoints/cli/main.py", line 73, in main
+[0;36m(APIServer pid=76251)[0;0m     args.dispatch_function(args)
+[0;36m(APIServer pid=76251)[0;0m     ~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+[0;36m(APIServer pid=76251)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/entrypoints/cli/serve.py", line 60, in cmd
+[0;36m(APIServer pid=76251)[0;0m     uvloop.run(run_server(args))
+[0;36m(APIServer pid=76251)[0;0m     ~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=76251)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/uvloop/__init__.py", line 96, in run
+[0;36m(APIServer pid=76251)[0;0m     return __asyncio.run(
+[0;36m(APIServer pid=76251)[0;0m            ~~~~~~~~~~~~~^
+[0;36m(APIServer pid=76251)[0;0m         wrapper(),
+[0;36m(APIServer pid=76251)[0;0m         ^^^^^^^^^^
+[0;36m(APIServer pid=76251)[0;0m     ...<2 lines>...
+[0;36m(APIServer pid=76251)[0;0m         **run_kwargs
+[0;36m(APIServer pid=76251)[0;0m         ^^^^^^^^^^^^
+[0;36m(APIServer pid=76251)[0;0m     )
+[0;36m(APIServer pid=76251)[0;0m     ^
+[0;36m(APIServer pid=76251)[0;0m   File "/usr/lib64/python3.13/asyncio/runners.py", line 195, in run
+[0;36m(APIServer pid=76251)[0;0m     return runner.run(main)
+[0;36m(APIServer pid=76251)[0;0m            ~~~~~~~~~~^^^^^^
+[0;36m(APIServer pid=76251)[0;0m   File "/usr/lib64/python3.13/asyncio/runners.py", line 118, in run
+[0;36m(APIServer pid=76251)[0;0m     return self._loop.run_until_complete(task)
+[0;36m(APIServer pid=76251)[0;0m            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+[0;36m(APIServer pid=76251)[0;0m   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+[0;36m(APIServer pid=76251)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/uvloop/__init__.py", line 48, in wrapper
+[0;36m(APIServer pid=76251)[0;0m     return await main
+[0;36m(APIServer pid=76251)[0;0m            ^^^^^^^^^^
+[0;36m(APIServer pid=76251)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/entrypoints/openai/api_server.py", line 1398, in run_server
+[0;36m(APIServer pid=76251)[0;0m     await run_server_worker(listen_address, sock, args, **uvicorn_kwargs)
+[0;36m(APIServer pid=76251)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/entrypoints/openai/api_server.py", line 1417, in run_server_worker
+[0;36m(APIServer pid=76251)[0;0m     async with build_async_engine_client(
+[0;36m(APIServer pid=76251)[0;0m                ~~~~~~~~~~~~~~~~~~~~~~~~~^
+[0;36m(APIServer pid=76251)[0;0m         args,
+[0;36m(APIServer pid=76251)[0;0m         ^^^^^
+[0;36m(APIServer pid=76251)[0;0m         client_config=client_config,
+[0;36m(APIServer pid=76251)[0;0m         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=76251)[0;0m     ) as engine_client:
+[0;36m(APIServer pid=76251)[0;0m     ^
+[0;36m(APIServer pid=76251)[0;0m   File "/usr/lib64/python3.13/contextlib.py", line 214, in __aenter__
+[0;36m(APIServer pid=76251)[0;0m     return await anext(self.gen)
+[0;36m(APIServer pid=76251)[0;0m            ^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=76251)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/entrypoints/openai/api_server.py", line 172, in build_async_engine_client
+[0;36m(APIServer pid=76251)[0;0m     async with build_async_engine_client_from_engine_args(
+[0;36m(APIServer pid=76251)[0;0m                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+[0;36m(APIServer pid=76251)[0;0m         engine_args,
+[0;36m(APIServer pid=76251)[0;0m         ^^^^^^^^^^^^
+[0;36m(APIServer pid=76251)[0;0m     ...<2 lines>...
+[0;36m(APIServer pid=76251)[0;0m         client_config=client_config,
+[0;36m(APIServer pid=76251)[0;0m         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=76251)[0;0m     ) as engine:
+[0;36m(APIServer pid=76251)[0;0m     ^
+[0;36m(APIServer pid=76251)[0;0m   File "/usr/lib64/python3.13/contextlib.py", line 214, in __aenter__
+[0;36m(APIServer pid=76251)[0;0m     return await anext(self.gen)
+[0;36m(APIServer pid=76251)[0;0m            ^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=76251)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/entrypoints/openai/api_server.py", line 213, in build_async_engine_client_from_engine_args
+[0;36m(APIServer pid=76251)[0;0m     async_llm = AsyncLLM.from_vllm_config(
+[0;36m(APIServer pid=76251)[0;0m         vllm_config=vllm_config,
+[0;36m(APIServer pid=76251)[0;0m     ...<6 lines>...
+[0;36m(APIServer pid=76251)[0;0m         client_index=client_index,
+[0;36m(APIServer pid=76251)[0;0m     )
+[0;36m(APIServer pid=76251)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/engine/async_llm.py", line 215, in from_vllm_config
+[0;36m(APIServer pid=76251)[0;0m     return cls(
+[0;36m(APIServer pid=76251)[0;0m         vllm_config=vllm_config,
+[0;36m(APIServer pid=76251)[0;0m     ...<9 lines>...
+[0;36m(APIServer pid=76251)[0;0m         client_index=client_index,
+[0;36m(APIServer pid=76251)[0;0m     )
+[0;36m(APIServer pid=76251)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/engine/async_llm.py", line 134, in __init__
+[0;36m(APIServer pid=76251)[0;0m     self.engine_core = EngineCoreClient.make_async_mp_client(
+[0;36m(APIServer pid=76251)[0;0m                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+[0;36m(APIServer pid=76251)[0;0m         vllm_config=vllm_config,
+[0;36m(APIServer pid=76251)[0;0m         ^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=76251)[0;0m     ...<4 lines>...
+[0;36m(APIServer pid=76251)[0;0m         client_index=client_index,
+[0;36m(APIServer pid=76251)[0;0m         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=76251)[0;0m     )
+[0;36m(APIServer pid=76251)[0;0m     ^
+[0;36m(APIServer pid=76251)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/engine/core_client.py", line 121, in make_async_mp_client
+[0;36m(APIServer pid=76251)[0;0m     return AsyncMPClient(*client_args)
+[0;36m(APIServer pid=76251)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/engine/core_client.py", line 820, in __init__
+[0;36m(APIServer pid=76251)[0;0m     super().__init__(
+[0;36m(APIServer pid=76251)[0;0m     ~~~~~~~~~~~~~~~~^
+[0;36m(APIServer pid=76251)[0;0m         asyncio_mode=True,
+[0;36m(APIServer pid=76251)[0;0m         ^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=76251)[0;0m     ...<3 lines>...
+[0;36m(APIServer pid=76251)[0;0m         client_addresses=client_addresses,
+[0;36m(APIServer pid=76251)[0;0m         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=76251)[0;0m     )
+[0;36m(APIServer pid=76251)[0;0m     ^
+[0;36m(APIServer pid=76251)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/engine/core_client.py", line 477, in __init__
+[0;36m(APIServer pid=76251)[0;0m     with launch_core_engines(vllm_config, executor_class, log_stats) as (
+[0;36m(APIServer pid=76251)[0;0m          ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=76251)[0;0m   File "/usr/lib64/python3.13/contextlib.py", line 148, in __exit__
+[0;36m(APIServer pid=76251)[0;0m     next(self.gen)
+[0;36m(APIServer pid=76251)[0;0m     ~~~~^^^^^^^^^^
+[0;36m(APIServer pid=76251)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/engine/utils.py", line 903, in launch_core_engines
+[0;36m(APIServer pid=76251)[0;0m     wait_for_engine_startup(
+[0;36m(APIServer pid=76251)[0;0m     ~~~~~~~~~~~~~~~~~~~~~~~^
+[0;36m(APIServer pid=76251)[0;0m         handshake_socket,
+[0;36m(APIServer pid=76251)[0;0m         ^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=76251)[0;0m     ...<5 lines>...
+[0;36m(APIServer pid=76251)[0;0m         coordinator.proc if coordinator else None,
+[0;36m(APIServer pid=76251)[0;0m         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0;36m(APIServer pid=76251)[0;0m     )
+[0;36m(APIServer pid=76251)[0;0m     ^
+[0;36m(APIServer pid=76251)[0;0m   File "/opt/venv/lib64/python3.13/site-packages/vllm/v1/engine/utils.py", line 960, in wait_for_engine_startup
+[0;36m(APIServer pid=76251)[0;0m     raise RuntimeError(
+[0;36m(APIServer pid=76251)[0;0m     ...<3 lines>...
+[0;36m(APIServer pid=76251)[0;0m     )
+[0;36m(APIServer pid=76251)[0;0m RuntimeError: Engine core initialization failed. See root cause above. Failed core proc(s): {}
