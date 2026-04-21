@@ -10,8 +10,13 @@ RUN dnf -y install --setopt=install_weak_deps=False --nodocs \
   && dnf clean all && rm -rf /var/cache/dnf/*
 
 # 2. Install Stable ROCm 7.2.1 SDK (DNF Method)
-RUN printf "[rocm]\nname=ROCm\nbaseurl=https://repo.radeon.com/rocm/fedora/43/main\nenabled=1\ngpgcheck=0\n" > /etc/yum.repos.d/rocm.repo && \
-  dnf -y install rocm-dev rocm-libs rccl-devel rocblas-devel hipblaslt-devel hipblas-devel \
+RUN printf "[ROCm-7.2.1]\nname=ROCm7.2.1\nbaseurl=https://repo.radeon.com/rocm/rhel10/7.2.1/main\nenabled=1\npriority=50\ngpgcheck=1\ngpgkey=https://repo.radeon.com/rocm/rocm.gpg.key\n" > /etc/yum.repos.d/rocm.repo
+
+RUN dnf -y --nodocs --setopt=install_weak_deps=False \
+  --exclude='*sdk*' --exclude='*samples*' --exclude='*-doc*' --exclude='*-docs*' \
+  install \
+  rocm-llvm rocm-device-libs hip-runtime-amd hip-devel \
+  rocblas rocblas-devel hipblas hipblas-devel hipblaslt-devel rccl rccl-devel rocm-cmake \
   && dnf clean all && rm -rf /var/cache/dnf/*
 
 # 3. Configure Global ROCm Environment
@@ -53,6 +58,9 @@ RUN python -m pip install --pre torch==2.9.1 torchaudio torchvision \
 # Flash-Attention
 WORKDIR /opt
 ENV FLASH_ATTENTION_TRITON_AMD_ENABLE="TRUE"
+ENV PYTORCH_ROCM_ARCH="gfx1201"
+ENV GPU_TARGETS="gfx1201"
+ENV AMDGPU_TARGETS="gfx1201"
 
 RUN git clone https://github.com/ROCm/flash-attention.git &&\ 
   cd flash-attention &&\
@@ -97,7 +105,7 @@ ENV CXX="/opt/rocm/llvm/bin/clang++"
 
 RUN export HIP_DEVICE_LIB_PATH=$(find /opt/rocm -type d -name bitcode -print -quit) && \
   echo "Compiling with Bitcode: $HIP_DEVICE_LIB_PATH" && \
-  export CMAKE_ARGS="-DROCM_PATH=/opt/rocm -DHIP_PATH=/opt/rocm -DAMDGPU_TARGETS=gfx1201 -DHIP_ARCHITECTURES=gfx1201" && \   
+  export CMAKE_ARGS="-DROCM_PATH=/opt/rocm -DHIP_PATH=/opt/rocm -DAMDGPU_TARGETS=gfx1201 -DHIP_ARCHITECTURES=gfx1201" && \
   python -m pip wheel --no-build-isolation --no-deps -w /tmp/dist -v . && \
   python -m pip install /tmp/dist/*.whl && \
   rm -rf /tmp/dist && \
