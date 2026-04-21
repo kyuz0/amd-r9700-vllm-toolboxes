@@ -16,9 +16,10 @@ RUN dnf -y --nodocs --setopt=install_weak_deps=False \
   --exclude='*sdk*' --exclude='*samples*' --exclude='*-doc*' --exclude='*-docs*' \
   install \
   rocm-llvm rocm-device-libs hip-runtime-amd hip-devel \
-  rocblas-devel hipblas-devel hipblaslt-devel rccl-devel rocm-cmake rocrand-devel hiprand-devel \
-  miopen-devel hipsparse-devel rocsparse-devel hipsolver-devel rocsolver-devel \
-  hipfft-devel rocfft-devel rocthrust-devel hipcub-devel \
+  rocblas rocblas-devel hipblas hipblas-devel hipblaslt hipblaslt-devel rccl rccl-devel \
+  rocm-cmake rocrand rocrand-devel hiprand hiprand-devel miopen miopen-devel \
+  hipsparse hipsparse-devel rocsparse rocsparse-devel hipsolver hipsolver-devel \
+  rocsolver rocsolver-devel hipfft hipfft-devel rocfft rocfft-devel rocthrust-devel hipcub-devel \
   && dnf clean all && rm -rf /var/cache/dnf/*
 
 # 3. Configure Global ROCm Environment
