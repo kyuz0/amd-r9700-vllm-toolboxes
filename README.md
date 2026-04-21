@@ -140,7 +140,7 @@ The `vllm-therock-gfx1201` image patches and tracks AMD ROCm nightlies. To rapid
 
 ```bash
 # Pull the script to your local host
-curl -O https://raw.githubusercontent.com/kyuz0/amd-r9700-vllm-toolboxes/main/scripts/refresh-toolbox.sh
+curl -O https://raw.githubusercontent.com/kyuz0/amd-r9700-vllm-toolboxes/main/refresh-toolbox.sh
 chmod +x refresh-toolbox.sh
 
 # Run to interactively pull 'stable' or 'latest'

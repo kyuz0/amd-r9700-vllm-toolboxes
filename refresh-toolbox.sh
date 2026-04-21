@@ -2,7 +2,7 @@
 
 set -e
 
-TOOLBOX_NAME="vllm"
+TOOLBOX_NAME="vllm-r9700"
 IMAGE_REPO="docker.io/kyuz0/vllm-therock-gfx1201"
 
 # --- Channel selection (stable / latest) ---

@@ -47,7 +47,6 @@ jobs:
             -DAMDGPU_TARGETS="gfx1201" \
             -DCMAKE_INSTALL_PREFIX=./install \
             -DBUILD_TESTS=OFF \
-            -DGENERATE_SYM_KERNELS=OFF \
             -DENABLE_AMDSMI=OFF \
             -DCMAKE_BUILD_TYPE=Release
           make -j$(nproc)
