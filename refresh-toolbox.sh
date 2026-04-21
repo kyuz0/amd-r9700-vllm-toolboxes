@@ -97,20 +97,6 @@ else
     distrobox create -n "$TOOLBOX_NAME" --image "$IMAGE" --additional-flags "$OPTIONS"
 fi
 
-# --- Cleanup: keep only the most recent image for this tag ---
-repo="${IMAGE%:*}"
 
-while read -r id ref dig; do
-    if [[ "$id" != "$new_id" ]]; then
-        $RUNTIME image rm -f "$id" >/dev/null 2>&1 || true
-    fi
-done < <($RUNTIME images --digests --format '{{.ID}} {{.Repository}}:{{.Tag}} {{.Digest}}' \
-         | awk -v ref="$IMAGE" -v ndig="$new_digest" '$2==ref && $3!=ndig')
-
-while read -r id; do
-    $RUNTIME image rm -f "$id" >/dev/null 2>&1 || true
-done < <($RUNTIME images --format '{{.ID}} {{.Repository}}:{{.Tag}}' \
-         | awk -v r="$repo" '$2==r":<none>" {print $1}')
-# --- end cleanup ---
 
 echo "✅ $TOOLBOX_NAME refreshed (channel: $CHANNEL)"
