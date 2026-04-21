@@ -1,7 +1,6 @@
 FROM registry.fedoraproject.org/fedora:43
 
 # 1. System Base & Build Tools
-# Added 'gperftools-libs' for tcmalloc (fixes double-free)
 RUN dnf -y install --setopt=install_weak_deps=False --nodocs \
   python3.12 python3.12-devel git rsync libatomic bash ca-certificates curl \
   gcc gcc-c++ binutils make ffmpeg-free \
@@ -10,25 +9,12 @@ RUN dnf -y install --setopt=install_weak_deps=False --nodocs \
   numactl-devel gperftools-libs dialog procps-ng \
   && dnf clean all && rm -rf /var/cache/dnf/*
 
-# 2. Install "TheRock" ROCm SDK (Tarball Method)
-WORKDIR /tmp
-ARG ROCM_MAJOR_VER=7
-ARG GFX=gfx120X-all
-RUN set -euo pipefail; \
-  BASE="https://therock-nightly-tarball.s3.amazonaws.com"; \
-  PREFIX="therock-dist-linux-${GFX}-${ROCM_MAJOR_VER}"; \
-  KEY="$(curl -s "${BASE}?list-type=2&prefix=${PREFIX}" \
-  | tr '<' '\n' \
-  | grep -o "therock-dist-linux-${GFX}-${ROCM_MAJOR_VER}\..*\.tar\.gz" \
-  | sort -V | tail -n1)"; \
-  echo "Downloading Latest Tarball: ${KEY}"; \
-  aria2c -x 16 -s 16 -j 16 --file-allocation=none "${BASE}/${KEY}" -o therock.tar.gz; \
-  mkdir -p /opt/rocm; \
-  tar xzf therock.tar.gz -C /opt/rocm --strip-components=1; \
-  rm therock.tar.gz
+# 2. Install Stable ROCm 7.2.1 SDK (DNF Method)
+RUN printf "[rocm]\nname=ROCm\nbaseurl=https://repo.radeon.com/rocm/fedora/43/main\nenabled=1\ngpgcheck=0\n" > /etc/yum.repos.d/rocm.repo && \
+  dnf -y install rocm-dev rocm-libs rccl-devel rocblas-devel hipblaslt-devel hipblas-devel \
+  && dnf clean all && rm -rf /var/cache/dnf/*
 
 # 3. Configure Global ROCm Environment
-# We add LD_PRELOAD for tcmalloc here to fix the shutdown crash
 RUN export ROCM_PATH=/opt/rocm && \
   BITCODE_PATH=$(find /opt/rocm -type d -name bitcode -print -quit) && \
   printf '%s\n' \
@@ -45,6 +31,8 @@ RUN export ROCM_PATH=/opt/rocm && \
   "export HIP_FORCE_DEV_KERNARG=1" \
   "export RAY_EXPERIMENTAL_NOSET_ROCR_VISIBLE_DEVICES=1" \
   "export LD_PRELOAD=/usr/lib64/libtcmalloc_minimal.so.4" \
+  "export VLLM_GPU_ARCH=gfx1201" \
+  "export VLLM_SKIP_SMI_CHECK=1" \
   > /etc/profile.d/rocm-sdk.sh && \
   chmod 0644 /etc/profile.d/rocm-sdk.sh
 
@@ -56,10 +44,9 @@ ENV PIP_NO_CACHE_DIR=1
 RUN printf 'source /opt/venv/bin/activate\n' > /etc/profile.d/venv.sh
 RUN python -m pip install --upgrade pip wheel packaging "setuptools<80.0.0"
 
-# 5. Install PyTorch (TheRock Nightly)
-RUN python -m pip install \
-  --index-url https://rocm.nightlies.amd.com/v2-staging/gfx120X-all/ \
-  --pre torch torchaudio torchvision && \
+# 5. Install PyTorch (Stable ROCm 7.2.1)
+RUN python -m pip install --pre torch==2.9.1 torchaudio torchvision \
+  --index-url https://download.pytorch.org/whl/rocm7.2.1 && \
   find /opt/venv/lib/python3.12/site-packages/torch* -type f -name "*.so" -exec strip -s {} + 2>/dev/null || true && \
   find /opt/venv/lib/python3.12/site-packages/torch* -type d -name "__pycache__" -prune -exec rm -rf {} +
 
@@ -78,27 +65,12 @@ RUN git clone https://github.com/vllm-project/vllm.git /opt/vllm
 WORKDIR /opt/vllm
 
 # --- PATCHING ---
-# vLLM relies on 'amdsmi' to detect AMD GPUs. If it's missing or fails (common in containers),
-# vLLM falls back to CPU. We patch it to force ROCm detection.
 RUN echo "import sys, re" > patch_vllm.py && \
   echo "from pathlib import Path" >> patch_vllm.py && \
-  # Patch 1: __init__.py - Force is_rocm=True and bypass amdsmi checks
+  # Patch 1: __init__.py - Force is_rocm=True
   echo "p = Path('vllm/platforms/__init__.py')" >> patch_vllm.py && \
   echo "txt = p.read_text()" >> patch_vllm.py && \
-  echo "txt = txt.replace('import amdsmi', '# import amdsmi')" >> patch_vllm.py && \
   echo "txt = re.sub(r'is_rocm = .*', 'is_rocm = True', txt)" >> patch_vllm.py && \
-  echo "txt = re.sub(r'if len\(amdsmi\.amdsmi_get_processor_handles\(\)\) > 0:', 'if True:', txt)" >> patch_vllm.py && \
-  echo "txt = txt.replace('amdsmi.amdsmi_init()', 'pass')" >> patch_vllm.py && \
-  echo "txt = txt.replace('amdsmi.amdsmi_shut_down()', 'pass')" >> patch_vllm.py && \
-  echo "p.write_text(txt)" >> patch_vllm.py && \
-  # Patch 2: rocm.py - Mock amdsmi and force device name
-  echo "p = Path('vllm/platforms/rocm.py')" >> patch_vllm.py && \
-  echo "txt = p.read_text()" >> patch_vllm.py && \
-  echo "header = 'import sys\nfrom unittest.mock import MagicMock\nsys.modules[\"amdsmi\"] = MagicMock()\n'" >> patch_vllm.py && \
-  echo "txt = header + txt" >> patch_vllm.py && \
-  echo "txt = re.sub(r'device_type = .*', 'device_type = \"rocm\"', txt)" >> patch_vllm.py && \
-  echo "txt = re.sub(r'device_name = .*', 'device_name = \"gfx1201\"', txt)" >> patch_vllm.py && \
-  echo "txt += '\n    def get_device_name(self, device_id: int = 0) -> str:\n        return \"AMD-gfx1201\"\n'" >> patch_vllm.py && \
   echo "p.write_text(txt)" >> patch_vllm.py && \
   # Patch 3: transformers_utils/config.py - Fix GenerationConfig lazy load
   echo "p = Path('vllm/transformers_utils/config.py')" >> patch_vllm.py && \
@@ -108,12 +80,7 @@ RUN echo "import sys, re" > patch_vllm.py && \
   echo "txt = txt.replace('from transformers import PretrainedConfig', 'from transformers.configuration_utils import PretrainedConfig')" >> patch_vllm.py && \
   echo "txt = txt.replace('from transformers import GenerationConfig', 'from transformers.generation import GenerationConfig')" >> patch_vllm.py && \
   echo "p.write_text(txt)" >> patch_vllm.py && \
-  # Patch 4: rocm.py - Hardcode _GCN_ARCH to bypass MagicMock regex crash
-  echo "p = Path('vllm/platforms/rocm.py')" >> patch_vllm.py && \
-  echo "txt = p.read_text()" >> patch_vllm.py && \
-  echo "txt = re.sub(r'_GCN_ARCH\s*=\s*_get_gcn_arch\(\)', '_GCN_ARCH = \"gfx1201\"', txt)" >> patch_vllm.py && \
-  echo "p.write_text(txt)" >> patch_vllm.py && \
-  echo "print('Successfully patched vLLM for R9700')" >> patch_vllm.py && \
+  echo "print('Successfully patched vLLM (Grouped Import fixes applied)')" >> patch_vllm.py && \
   python patch_vllm.py
 
 # 7. Build vLLM (Wheel Method) with CLANG Host Compiler
@@ -125,10 +92,6 @@ ENV PYTORCH_ROCM_ARCH="gfx1201"
 ENV HIP_ARCHITECTURES="gfx1201"          
 ENV AMDGPU_TARGETS="gfx1201"              
 ENV MAX_JOBS="4"
-
-# --- FIX FOR SEGFAULT ---
-# We force the Host Compiler (CC/CXX) to be the ROCm Clang, not Fedora GCC.
-# This aligns the ABI of the compiled vLLM extensions with PyTorch.
 ENV CC="/opt/rocm/llvm/bin/clang"
 ENV CXX="/opt/rocm/llvm/bin/clang++"
 
@@ -146,11 +109,9 @@ WORKDIR /opt
 RUN git clone -b rocm_enabled_multi_backend https://github.com/ROCm/bitsandbytes.git
 WORKDIR /opt/bitsandbytes
 
-# Explicitly set HIP_PLATFORM (Docker ENV, not /etc/profile)
 ENV HIP_PLATFORM="amd"
 ENV CMAKE_PREFIX_PATH="/opt/rocm"
 
-# Force CMake to use the System ROCm Compiler (/opt/rocm/llvm/bin/clang++)
 RUN cmake -S . \
   -DGPU_TARGETS="gfx1201" \
   -DBNB_ROCM_ARCH="gfx1201" \
@@ -174,15 +135,6 @@ COPY benchmarks/run_vllm_bench.py /opt/run_vllm_bench.py
 RUN chmod 0644 /etc/profile.d/*.sh && chmod +x /usr/local/bin/start-vllm && chmod 0644 /opt/max_context_results.json
 RUN printf 'ulimit -S -c 0\n' > /etc/profile.d/90-nocoredump.sh && chmod 0644 /etc/profile.d/90-nocoredump.sh
 
-# 9. Install Custom RCCL (gfx1201) - Replaces standard library with manually built one
-COPY custom_libs/librccl.so.1.gz /tmp/librccl.so.1.gz
-RUN echo "Installing Custom RCCL..." && \
-  gzip -d /tmp/librccl.so.1.gz && \
-  chmod 755 /tmp/librccl.so.1 && \
-  # Replace /opt/rocm library strictly
-  cp -fv /tmp/librccl.so.1 /opt/rocm/lib/librccl.so.1.0 && \
-  # Replace /opt/venv library
-  find /opt/venv -name "librccl.so*" -type f -exec cp -fv /tmp/librccl.so.1 {} + && \
-  rm /tmp/librccl.so.1
+# Custom RCCL injection removed for stable ROCm 7.2.1 flow.
 
 CMD ["/bin/bash"]

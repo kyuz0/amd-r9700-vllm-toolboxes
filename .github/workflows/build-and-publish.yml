@@ -11,6 +11,14 @@ on:
         description: "Run ID of build-rccl to use (leave empty for latest)"
         required: false
         default: ""
+      dockerfile:
+        description: "Which Dockerfile to build"
+        required: true
+        type: choice
+        default: "Dockerfile.rocm7.2.1"
+        options:
+          - Dockerfile.rocm7.2.1
+          - Dockerfile
 
 env:
   IMAGE_REPO: kyuz0/vllm-therock-gfx1201
@@ -96,7 +104,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile
+          file: ./${{ github.event.inputs.dockerfile }}
           platforms: linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
