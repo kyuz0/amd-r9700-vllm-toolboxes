@@ -40,6 +40,10 @@ jobs:
           cd /opt/rccl-custom
           git clone --recursive https://github.com/ROCm/rccl.git .
           mkdir -p build && cd build
+          
+          # Fix typo in RCCL fallback stub for SymkGetKernelPtr (missing 'k')
+          sed -i 's/void\* ncclSymGetKernelPtr/void\* ncclSymkGetKernelPtr/g' ../src/sym_kernels.cc
+          
           CXX=/opt/rocm/bin/hipcc cmake .. \
             -DCMAKE_CXX_COMPILER=/opt/rocm/bin/hipcc \
             -DDEFAULT_GPUS="gfx1201" \
@@ -48,7 +52,6 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=./install \
             -DBUILD_TESTS=OFF \
             -DENABLE_AMDSMI=OFF \
-            -DGENERATE_SYM_KERNELS=ON \
             -DCMAKE_BUILD_TYPE=Release
           make -j$(nproc)
           make install
