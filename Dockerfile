@@ -3,7 +3,7 @@ FROM registry.fedoraproject.org/fedora:43
 # 1. System Base & Build Tools
 # Added 'gperftools-libs' for tcmalloc (fixes double-free)
 RUN dnf -y install --setopt=install_weak_deps=False --nodocs \
-  python3.13 python3.13-devel git rsync libatomic bash ca-certificates curl \
+  python3.12 python3.12-devel git rsync libatomic bash ca-certificates curl \
   gcc gcc-c++ binutils make ffmpeg-free \
   cmake ninja-build aria2c tar xz vim nano \
   libdrm-devel zlib-devel openssl-devel jq \
@@ -49,7 +49,7 @@ RUN export ROCM_PATH=/opt/rocm && \
   chmod 0644 /etc/profile.d/rocm-sdk.sh
 
 # 4. Python Venv Setup
-RUN /usr/bin/python3.13 -m venv /opt/venv
+RUN /usr/bin/python3.12 -m venv /opt/venv
 ENV VIRTUAL_ENV=/opt/venv
 ENV PATH=/opt/venv/bin:$PATH
 ENV PIP_NO_CACHE_DIR=1
