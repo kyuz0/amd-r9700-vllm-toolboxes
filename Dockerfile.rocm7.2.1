@@ -50,17 +50,17 @@ RUN echo "import sys, re" > patch_vllm.py && \
   # Patch 2: rocm.py - Mock amdsmi and force device name
   echo "p = Path('vllm/platforms/rocm.py')" >> patch_vllm.py && \
   echo "txt = p.read_text()" >> patch_vllm.py && \
-  echo "header = 'import sys\nfrom unittest.mock import MagicMock\nsys.modules[\"amdsmi\"] = MagicMock()\n'" >> patch_vllm.py && \
+  echo "header = 'import sys' + chr(10) + 'from unittest.mock import MagicMock' + chr(10) + 'sys.modules[\"amdsmi\"] = MagicMock()' + chr(10)" >> patch_vllm.py && \
   echo "txt = header + txt" >> patch_vllm.py && \
   echo "txt = re.sub(r'device_type = .*', 'device_type = \"rocm\"', txt)" >> patch_vllm.py && \
   echo "txt = re.sub(r'device_name = .*', 'device_name = \"gfx1201\"', txt)" >> patch_vllm.py && \
-  echo "txt += '\n    def get_device_name(self, device_id: int = 0) -> str:\n        return \"AMD-gfx1201\"\n'" >> patch_vllm.py && \
+  echo "txt += chr(10) + '    def get_device_name(self, device_id: int = 0) -> str:' + chr(10) + '        return \"AMD-gfx1201\"' + chr(10)" >> patch_vllm.py && \
   echo "p.write_text(txt)" >> patch_vllm.py && \
   # Patch 3: transformers_utils/config.py - Fix GenerationConfig lazy load
   echo "p = Path('vllm/transformers_utils/config.py')" >> patch_vllm.py && \
   echo "txt = p.read_text()" >> patch_vllm.py && \
-  echo "txt = txt.replace('from transformers import GenerationConfig, PretrainedConfig', 'from transformers.generation import GenerationConfig\nfrom transformers.configuration_utils import PretrainedConfig')" >> patch_vllm.py && \
-  echo "txt = txt.replace('from transformers import PretrainedConfig, GenerationConfig', 'from transformers.generation import GenerationConfig\nfrom transformers.configuration_utils import PretrainedConfig')" >> patch_vllm.py && \
+  echo "txt = txt.replace('from transformers import GenerationConfig, PretrainedConfig', 'from transformers.generation import GenerationConfig' + chr(10) + 'from transformers.configuration_utils import PretrainedConfig')" >> patch_vllm.py && \
+  echo "txt = txt.replace('from transformers import PretrainedConfig, GenerationConfig', 'from transformers.generation import GenerationConfig' + chr(10) + 'from transformers.configuration_utils import PretrainedConfig')" >> patch_vllm.py && \
   echo "txt = txt.replace('from transformers import PretrainedConfig', 'from transformers.configuration_utils import PretrainedConfig')" >> patch_vllm.py && \
   echo "txt = txt.replace('from transformers import GenerationConfig', 'from transformers.generation import GenerationConfig')" >> patch_vllm.py && \
   echo "p.write_text(txt)" >> patch_vllm.py && \
