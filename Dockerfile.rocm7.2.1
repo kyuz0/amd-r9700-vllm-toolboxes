@@ -78,8 +78,7 @@ RUN git clone -b rocm_enabled_multi_backend https://github.com/ROCm/bitsandbytes
 
 ############# Build Base Phase #############
 FROM rocm_base AS build_base
-# Install Build dependencies natively via pip using break-system-packages (already set in base, but ensure it)
-RUN pip3 install --upgrade build cmake ninja packaging wheel numpy "setuptools-scm>=8" "setuptools<80.0.0" scikit-build-core pybind11
+RUN pip3 install --upgrade --ignore-installed build cmake ninja packaging wheel numpy "setuptools-scm>=8" "setuptools<80.0.0" scikit-build-core pybind11
 
 ############# Build wheels Phase #############
 FROM build_base AS build_fa
