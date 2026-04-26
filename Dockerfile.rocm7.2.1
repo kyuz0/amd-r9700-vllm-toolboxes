@@ -23,8 +23,7 @@ ENV TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1
 ENV VLLM_TARGET_DEVICE=rocm
 ENV HIP_FORCE_DEV_KERNARG=1
 ENV RAY_EXPERIMENTAL_NOSET_ROCR_VISIBLE_DEVICES=1
-# LD_PRELOAD for ubuntu packaging of tcmalloc
-ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libtcmalloc_minimal.so.4
+# LD_PRELOAD for ubuntu packaging of tcmalloc is moved to final stage
 
 ############# Fetch Sources Phase #############
 FROM rocm_base AS files_fa
@@ -131,6 +130,9 @@ FROM rocm_base AS final
 RUN apt-get update && apt-get install -y --no-install-recommends \
     dialog vim pciutils procps libtcmalloc-minimal4 && \
     rm -rf /var/lib/apt/lists/*
+
+# Fix shutdown crashes
+ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libtcmalloc_minimal.so.4
 
 # Install generated python wheels
 RUN --mount=type=bind,from=build_fa,src=/dist/,target=/dist_fa \
