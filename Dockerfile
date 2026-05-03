@@ -171,7 +171,8 @@ COPY scripts/zz-venv-last.sh /etc/profile.d/zz-venv-last.sh
 COPY scripts/start_vllm.py /usr/local/bin/start-vllm
 COPY benchmarks/max_context_results.json /opt/max_context_results.json
 COPY benchmarks/run_vllm_bench.py /opt/run_vllm_bench.py
-RUN chmod 0644 /etc/profile.d/*.sh && chmod +x /usr/local/bin/start-vllm && chmod 0644 /opt/max_context_results.json
+COPY benchmarks/models.py /opt/models.py
+RUN chmod 0644 /etc/profile.d/*.sh && chmod +x /usr/local/bin/start-vllm && chmod 0644 /opt/max_context_results.json && chmod 0644 /opt/models.py
 RUN printf 'ulimit -S -c 0\n' > /etc/profile.d/90-nocoredump.sh && chmod 0644 /etc/profile.d/90-nocoredump.sh
 
 # 9. Install Custom RCCL (gfx1201) - Replaces standard library with manually built one

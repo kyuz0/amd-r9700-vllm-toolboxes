@@ -2,28 +2,31 @@
 import sys
 import os
 import json
+import time
 import shutil
 import tempfile
 import subprocess
-import time
 from pathlib import Path
 
-# Add benchmarks dir to path to import config
 # Add benchmarks dir to path to import config
 SCRIPT_DIR = Path(__file__).parent.resolve()
 BENCH_DIR = SCRIPT_DIR.parent / "benchmarks"
 OPT_DIR = Path("/opt")
 
-# Check /opt first (Container), then local fallback
+# Check /opt first (Container), then local fallback for results file location
 if (OPT_DIR / "run_vllm_bench.py").exists():
     sys.path.append(str(OPT_DIR))
 else:
     sys.path.append(str(BENCH_DIR))
+    # Also ensure current script dir is in path for local 'models' import if not already
+    sys.path.append(str(SCRIPT_DIR))
 
 try:
-    from run_vllm_bench import MODEL_TABLE, MODELS_TO_RUN
+    import models
+    MODEL_TABLE = models.MODEL_TABLE
+    MODELS_TO_RUN = models.MODELS_TO_RUN
 except ImportError:
-    print("Error: Could not import run_vllm_bench.py config.")
+    print("Error: Could not import models.py config.")
     sys.exit(1)
 
 if (OPT_DIR / "max_context_results.json").exists():
@@ -33,10 +36,76 @@ else:
 HOST = os.getenv("HOST", "0.0.0.0")
 PORT = os.getenv("PORT", "8000")
 
-def check_dependencies():
-    if not shutil.which("dialog"):
-        print("Error: 'dialog' is required. Please install it (apt-get install dialog).")
-        sys.exit(1)
+def find_r9700():
+    """Finds ALL gfx1201 GPUs and sets HIP_VISIBLE_DEVICES.
+    
+    CRITICAL: Do NOT set CUDA_VISIBLE_DEVICES or ROCR_VISIBLE_DEVICES.
+    Those conflict with HIP_VISIBLE_DEVICES and break RCCL initialization,
+    causing vLLM to hang at distributed init.
+    """
+    gfx1201_indices = []
+    try:    
+        res = subprocess.run(
+            ["rocm-smi", "--showproductname"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        )
+        current_gpu = None
+        for line in res.stdout.split("\n"):
+            if "GPU[" in line and "]" in line:
+                current_gpu = line.split("]")[0].split("[")[1].strip()
+            if current_gpu and "gfx1201" in line.lower():
+                if current_gpu not in gfx1201_indices:
+                    gfx1201_indices.append(current_gpu)
+                current_gpu = None  # Reset so we don't double-count
+    except Exception:
+        pass
+    
+    if gfx1201_indices:
+        visible = ",".join(gfx1201_indices)
+        os.environ["HIP_VISIBLE_DEVICES"] = visible
+        print(f"[*] Found {len(gfx1201_indices)} R9700(s) → HIP_VISIBLE_DEVICES={visible}")
+    else:
+        print("[!] Could not detect R9700 via rocm-smi, defaulting to HIP_VISIBLE_DEVICES=0")
+        os.environ["HIP_VISIBLE_DEVICES"] = "0"
+
+def fix_multi_gpu_jit():
+    """
+    Replaces /opt/rocm/bin/hipcc with a wrapper script that intercepts
+    --offload-arch=native and rewrites it to --offload-arch=gfx1201
+    before forwarding to the real compiler.
+
+    This is the nuclear option. The Python source constructs the flag
+    dynamically (f-strings, variables), so sed can never match it.
+    The only reliable interception point is hipcc itself.
+    """
+    real_hipcc = "/opt/rocm/bin/hipcc.real"
+    hipcc = "/opt/rocm/bin/hipcc"
+
+    if os.path.exists(real_hipcc):
+        print("[*] hipcc wrapper already installed from previous run.")
+        return
+
+    print("[*] Installing hipcc wrapper: --offload-arch=native → --offload-arch=gfx1201")
+    try:
+        # Move real hipcc out of the way
+        os.rename(hipcc, real_hipcc)
+
+        # Write wrapper
+        with open(hipcc, "w") as f:
+            f.write("#!/bin/bash\n")
+            f.write("# R9700 hipcc wrapper: forces single-arch gfx1201 compilation\n")
+            f.write('args=()\n')
+            f.write('for arg in "$@"; do\n')
+            f.write('    args+=("${arg//--offload-arch=native/--offload-arch=gfx1201}")\n')
+            f.write('done\n')
+            f.write('exec /opt/rocm/bin/hipcc.real "${args[@]}"\n')
+
+        os.chmod(hipcc, 0o755)
+        print("[*] hipcc wrapper installed successfully.")
+    except PermissionError:
+        print("[!] Cannot patch hipcc (permission denied). Try: sudo start-vllm")
+    except Exception as e:
+        print(f"[!] hipcc patch failed: {e}")
 
 def detect_gpus():
     """Detects AMD GPUs via rocm-smi or /dev/dri."""
@@ -54,14 +123,39 @@ def detect_gpus():
     except:
         return 1
 
+def get_discovered_models():
+    """
+    Returns all models defined in models.py that are compatible with the current hardware constraints.
+    """
+    gpu_count = detect_gpus()
+    compatible_models = []
+    
+    for m in MODELS_TO_RUN:
+        if m in MODEL_TABLE:
+            valid_tps = MODEL_TABLE[m].get("valid_tp", [1])
+            min_required = min(valid_tps)
+            if min_required <= gpu_count:
+                compatible_models.append(m)
+                
+    return compatible_models
+
+# Refresh the list of models to run based on what we found
+MODELS_TO_RUN = get_discovered_models()
+
+def check_dependencies():
+    if not shutil.which("dialog"):
+        print("Error: 'dialog' is required. Please install it (apt-get install dialog).")
+        sys.exit(1)
+
 def get_verified_config(model_id, tp_size, max_seqs):
     """
     Reads max_context_results.json to find the best verified configuration.
     Returns dict: {'ctx': int, 'util': float}
     """
+    config = MODEL_TABLE.get(model_id, {})
     default_config = {
-        "ctx": int(MODEL_TABLE.get(model_id, {}).get("ctx", 8192)),
-        "util": 0.90 # Safe default
+        "ctx": config.get("ctx", "auto"),
+        "util": float(config.get("gpu_util", 0.90)) # Safe default
     }
     
     if not RESULTS_FILE.exists():
@@ -111,15 +205,17 @@ def run_dialog(args):
 def nuke_vllm_cache():
     """Removes vLLM cache directory to fix potential graph/incompatibility issues."""
     cache = Path.home() / ".cache" / "vllm"
-    if cache.exists():
-        try:
-            print(f"Clearing vLLM cache at {cache}...", end="", flush=True)
-            subprocess.run(["rm", "-rf", str(cache)], check=True)
-            cache.mkdir(parents=True, exist_ok=True)
-            print(" Done.")
-            time.sleep(1)
-        except Exception as e:
-            print(f" Failed: {e}")
+    triton_cache = Path.home() / ".triton" / "cache"
+    aiter_cache = Path.home() / ".aiter"
+    
+    for cache_dir, label in [(cache, "vLLM"), (triton_cache, "Triton"), (aiter_cache, "Aiter JIT")]:
+        if cache_dir.exists():
+            try:
+                print(f"Clearing {label} cache at {cache_dir}...", end="", flush=True)
+                subprocess.run(["rm", "-rf", str(cache_dir)], check=True)
+                print(" Done.")
+            except Exception as e:
+                print(f" Failed: {e}")
 
 def configure_and_launch(model_idx, gpu_count):
     model_id = MODELS_TO_RUN[model_idx]
@@ -138,16 +234,16 @@ def configure_and_launch(model_idx, gpu_count):
     current_ctx = verified["ctx"]
     current_util = verified["util"]
     
-    clear_cache = False
+    clear_cache = True  # Default ON: stale graphs from version upgrades cause crashes
     use_eager = config.get("enforce_eager", False) # Default to model config, usually False
-    use_rocm_attn = False # Default to Triton
+    attn_backends = ["Triton", "ROCm (CK)", "AITER"]
+    current_attn_backend = "Triton" # Default to Triton
     
     name = model_id.split("/")[-1]
     
     while True:
         cache_status = "YES" if clear_cache else "NO"
         eager_status = "YES" if use_eager else "NO"
-        attn_backend = "ROCm" if use_rocm_attn else "Triton"
         
         menu_args = [
             "--clear", "--backtitle", f"AMD R9700 vLLM Launcher (GPUs: {gpu_count})",
@@ -157,7 +253,7 @@ def configure_and_launch(model_idx, gpu_count):
             "2", f"Concurrent Requests:  {current_seqs}",
             "3", f"Context Length:       {current_ctx} (Verified)",
             "4", f"GPU Utilization:      {current_util} (Verified)",
-            "5", f"Attention Backend:    {attn_backend}",
+            "5", f"Attention Backend:    {current_attn_backend}",
             "6", f"Erase vLLM Cache:     {cache_status}",
             "7", f"Force Eager Mode:     {eager_status}",
             "8", "LAUNCH SERVER"
@@ -211,8 +307,9 @@ def configure_and_launch(model_idx, gpu_count):
              pass 
 
         elif choice == "5":
-            # Toggle Attention Backend
-            use_rocm_attn = not use_rocm_attn
+            # Cycle Attention Backend
+            idx = attn_backends.index(current_attn_backend)
+            current_attn_backend = attn_backends[(idx + 1) % len(attn_backends)]
 
         elif choice == "6":
             # Toggle Cache
@@ -248,6 +345,9 @@ def configure_and_launch(model_idx, gpu_count):
     # Build Command
     subprocess.run(["clear"])
     
+    # Patch aiter source FIRST, then nuke caches so fresh build uses patched source
+    fix_multi_gpu_jit()
+    
     if clear_cache:
         nuke_vllm_cache()
     
@@ -264,29 +364,64 @@ def configure_and_launch(model_idx, gpu_count):
     
     if config.get("trust_remote"): cmd.append("--trust-remote-code")
     if use_eager: cmd.append("--enforce-eager")
+    if config.get("language_model_only"): cmd.append("--language-model-only")
+    
+    if "max_tokens" in config:
+        cmd.extend(["--max-num-batched-tokens", str(config["max_tokens"])])
+        
+    if "kv_cache_dtype" in config:
+        cmd.extend(["--kv-cache-dtype", config["kv_cache_dtype"]])
     
     # Env Vars
     env = os.environ.copy()
-    env.update(config.get("env", {}))
+    env["VLLM_DISABLE_COMPILE_CACHE"] = "1"
     
-    if use_rocm_attn:
-        env["VLLM_V1_USE_PREFILL_DECODE_ATTENTION"] = "1"
-        env["VLLM_USE_TRITON_FLASH_ATTN"] = "0"
-        # Optional: Explicitly mention these in print
-        
+    if current_attn_backend == "AITER":
+        env["VLLM_ROCM_USE_AITER"] = "1"
+        cmd.extend(["--attention-backend", "ROCM_ATTN"])
+    elif current_attn_backend == "ROCm (CK)":
+        if "VLLM_ROCM_USE_AITER" in env:
+            del env["VLLM_ROCM_USE_AITER"]
+        cmd.extend(["--attention-backend", "ROCM_ATTN"])
+    else: # Triton
+        if "VLLM_ROCM_USE_AITER" in env:
+            del env["VLLM_ROCM_USE_AITER"]
+        cmd.extend(["--attention-backend", "TRITON_ATTN"])
+
+    env.update(config.get("env", {}))
+
+    # ViT attention on RDNA: the default falls to TORCH_SDPA (flash_attn's
+    # Triton-AMD subpackage isn't available) which produces NaN/Inf embeddings
+    # and collapses the LM into an endless '!' stream. TRITON_ATTN uses vLLM's
+    # own Triton ViT wrapper and is numerically healthy. No-op for LM-only.
+    cmd.extend(["--mm-encoder-attn-backend", "TRITON_ATTN"])
+
     
     print("\n" + "="*60)
     print(f" Launching: {name}")
     print(f" Config:    TP={current_tp} | Seqs={current_seqs} | Ctx={current_ctx} | Util={current_util}")
-    print(f" Backend:   {'ROCm' if use_rocm_attn else 'Triton'}")
+    print(f" Backend:   {current_attn_backend}")
+    if current_tp > gpu_count:
+        print(f"Warning: Model requires TP={current_tp} but only {gpu_count} GPUs detected.")
+        print("Command may fail.")
+        
     if clear_cache:
-        print(f" Action:    Clearing vLLM Cache (~/.cache/vllm)")
-    print(f" Command:   {' '.join(cmd)}")
+        print(f" Action:    Clearing vLLM/Triton Caches")
+        
+    # Variables that represent the custom environment overrides for models
+    custom_env = config.get("env", {})
+    if custom_env:
+        print("\n --- Environment Variables ---")
+        for k, v in custom_env.items():
+            print(f" export {k}={v}")
+            
+    print(f"\n Command:   {' '.join(cmd)}")
     print("="*60 + "\n")
     
     os.execvpe("vllm", cmd, env)
 
 def main():
+    find_r9700()
     check_dependencies()
     gpu_count = detect_gpus()
     
