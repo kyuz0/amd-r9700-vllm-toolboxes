@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Image tag to publish (e.g. latest)"
+        description: "Image tag to publish (e.g. dev)"
         required: true
-        default: "latest"
+        default: "dev"
       rccl_run_id:
         description: "Run ID of build-rccl to use (leave empty for latest)"
         required: false

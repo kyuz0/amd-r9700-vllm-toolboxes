@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       source_tag:
-        description: "Tag to promote to 'stable' (e.g. latest, 20260419-143000)"
+        description: "Tag to promote to 'latest' (e.g. dev, 20260419-143000)"
         required: true
-        default: "latest"
+        default: "dev"
 
 env:
   IMAGE_REPO: kyuz0/vllm-therock-gfx1201
@@ -21,11 +21,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Pull, re-tag, and push as stable
+      - name: Pull, re-tag, and push as latest
         run: |
           set -eux
           SOURCE="docker.io/${{ env.IMAGE_REPO }}:${{ github.event.inputs.source_tag }}"
-          TARGET="docker.io/${{ env.IMAGE_REPO }}:stable"
+          TARGET="docker.io/${{ env.IMAGE_REPO }}:latest"
 
           echo "Promoting $SOURCE → $TARGET"
           docker pull "$SOURCE"
@@ -34,7 +34,7 @@ jobs:
 
       - name: Summary
         run: |
-          echo "### ✅ Promoted to stable" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ Promoted to latest" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Source:** \`${{ env.IMAGE_REPO }}:${{ github.event.inputs.source_tag }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Target:** \`${{ env.IMAGE_REPO }}:stable\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Target:** \`${{ env.IMAGE_REPO }}:latest\`" >> $GITHUB_STEP_SUMMARY
