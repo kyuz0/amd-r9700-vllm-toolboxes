@@ -73,12 +73,15 @@ echo "Applied Undervolt (-75mV)"
 
 # 4. Set Power Limit to 315W
 # Find the hwmon directory strictly inside the device
-HWMON_DIR=$(find "$CARD_PATH/device/hwmon/" -maxdepth 1 -name "hwmon*" | head -n 1)
-if [ -n "$HWMON_DIR" ]; then
-    echo "315000000" | sudo tee "$HWMON_DIR/power1_cap" > /dev/null
-    echo "Applied Power Limit (315W)"
+HWMON_DIR=$(find "$CARD_PATH/device/hwmon" -mindepth 1 -maxdepth 1 -type d -name "hwmon*" | head -n 1)
+if [ -n "$HWMON_DIR" ] && [ -e "$HWMON_DIR/power1_cap" ]; then
+    if echo "315000000" | sudo tee "$HWMON_DIR/power1_cap" > /dev/null; then
+        echo "Applied Power Limit (315W)"
+    else
+        echo "Error: Failed to apply Power Limit."
+    fi
 else
-    echo "Error: Could not find hwmon directory for power limit."
+    echo "Error: Could not find writable power1_cap under hwmon."
 fi
 ```
 
