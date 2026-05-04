@@ -61,8 +61,7 @@ def get_gpu_count():
         # Output format: "GPU[0] : Device Name: ..."
         res = subprocess.run(["rocm-smi", "--showid"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if res.returncode == 0:
-            # Filter specifically for the target GPU as requested
-            target_gpu = "AMD Radeon AI PRO R9700"
+            target_gpu = "AMD Radeon Graphics"
             count = 0
             for line in res.stdout.strip().split('\n'):
                 if "Device Name" in line and target_gpu in line:
@@ -77,9 +76,15 @@ def get_gpu_count():
         return 2
 
 def kill_vllm():
-    subprocess.run("pgrep -f 'vllm serve' | xargs -r kill -9", 
-                   shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    time.sleep(5)
+    cmds = [
+        "pgrep -f 'vllm bench' | xargs -r kill -9",
+        "pgrep -f 'vllm serve' | xargs -r kill -9",
+        "pgrep -f 'VLLM::' | xargs -r kill -9",
+        "pgrep -f 'ray::' | xargs -r kill -9"
+    ]
+    for cmd in cmds:
+        subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    time.sleep(2)
 
 def nuke_vllm_cache():
     cache = Path.home() / ".cache" / "vllm"
@@ -204,8 +209,12 @@ def run_throughput(model, tp_size, backend_name="Default", output_dir=RESULTS_DI
 
     try: 
         subprocess.run(cmd, check=True, env=env)
-    except: 
+    except Exception as e: 
         log(f"ERROR: Failed {model} [{backend_name}]")
+        try:
+            with open(output_file, 'w') as f:
+                json.dump({"error": "Failed"}, f)
+        except: pass
 
 
 def print_summary(tps):
@@ -248,7 +257,7 @@ def print_summary(tps):
                     p1 = (RESULTS_DIR / "triton") / f"{prefix}{tag_suffix}_throughput.json"
                     if p1.exists():
                         d1 = json.loads(p1.read_text())
-                        val1 = f"{d1.get('tokens_per_second', 0):.1f}"
+                        val1 = d1["error"] if "error" in d1 else f"{d1.get('tokens_per_second', 0):.1f}"
                     else:
                         val1 = "N/A"
                 except: val1 = "N/A"
@@ -258,7 +267,7 @@ def print_summary(tps):
                     p2 = (RESULTS_DIR / "rocm") / f"{prefix}{tag_suffix}_throughput.json"
                     if p2.exists():
                         d2 = json.loads(p2.read_text())
-                        val2 = f"{d2.get('tokens_per_second', 0):.1f}"
+                        val2 = d2["error"] if "error" in d2 else f"{d2.get('tokens_per_second', 0):.1f}"
                     else:
                         val2 = "N/A"
                 except: val2 = "N/A"
@@ -268,7 +277,7 @@ def print_summary(tps):
                     p3 = (RESULTS_DIR / "aiter") / f"{prefix}{tag_suffix}_throughput.json"
                     if p3.exists():
                         d3 = json.loads(p3.read_text())
-                        val3 = f"{d3.get('tokens_per_second', 0):.1f}"
+                        val3 = d3["error"] if "error" in d3 else f"{d3.get('tokens_per_second', 0):.1f}"
                     else:
                         val3 = "N/A"
                 except: val3 = "N/A"
@@ -280,7 +289,7 @@ def print_summary(tps):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="VLLM High-Concurrency Throughput Benchmark Suite")
-    parser.add_argument("--tp", type=int, nargs="+", default=[1])
+    parser.add_argument("--tp", type=int, nargs="+", default=[1, 2])
     parser.add_argument("--tui", action="store_true", help="Launch interactive configuration UI")
     args = parser.parse_args()
     

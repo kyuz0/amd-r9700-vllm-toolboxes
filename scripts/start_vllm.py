@@ -111,9 +111,13 @@ def detect_gpus():
     """Detects AMD GPUs via rocm-smi or /dev/dri."""
     try:
         # Try rocm-smi first
-        res = subprocess.run(["rocm-smi", "--showid", "--csv"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        res = subprocess.run(["rocm-smi", "--showid"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if res.returncode == 0:
-            count = res.stdout.count("GPU")
+            target_gpu = "AMD Radeon Graphics"
+            count = 0
+            for line in res.stdout.strip().split('\n'):
+                if "Device Name" in line and target_gpu in line:
+                    count += 1
             if count > 0: return count
     except: pass
     

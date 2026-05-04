@@ -2,8 +2,8 @@
 Centralized model execution profiles for R9700 benchmark and launcher.
 """
 
-GPU_UTIL = "0.98"
-OFF_NUM_PROMPTS = 1000 
+GPU_UTIL = "0.95"
+OFF_NUM_PROMPTS = 500 
 OFF_FORCED_OUTPUT = "512"
 DEFAULT_BATCH_TOKENS = "8192"
 
@@ -55,7 +55,7 @@ MODEL_TABLE = {
     "cyankiwi/gemma-4-26B-A4B-it-AWQ-4bit": {
         "trust_remote": True,
         "valid_tp": [1,2],
-        "max_num_seqs": "16",
+        "max_num_seqs": "32",
         "max_tokens": "2048",
         "ctx": "8192",
         "language_model_only": True,
@@ -67,7 +67,19 @@ MODEL_TABLE = {
     "cyankiwi/gemma-4-31B-it-AWQ-4bit": {
         "trust_remote": True,
         "valid_tp": [1,2],
-        "max_num_seqs": "16",
+        "max_num_seqs": "32",
+        "max_tokens": "2048",
+        "ctx": "4096",
+        "language_model_only": True,
+        "enforce_eager": True,
+        "gpu_util": "0.90",
+        "kv_cache_dtype": "fp8"
+    },
+
+    "RedHatAI/Qwen3.6-35B-A3B-FP8": {
+        "trust_remote": True,
+        "valid_tp": [2],
+        "max_num_seqs": "32",
         "max_tokens": "2048",
         "ctx": "4096",
         "language_model_only": True,
@@ -83,5 +95,6 @@ MODELS_TO_RUN = [
     "cyankiwi/Qwen3.6-27B-AWQ-INT4",
     "cyankiwi/Qwen3.6-35B-A3B-AWQ-4bit",
     "cyankiwi/gemma-4-26B-A4B-it-AWQ-4bit",
-    "cyankiwi/gemma-4-31B-it-AWQ-4bit"
+    "cyankiwi/gemma-4-31B-it-AWQ-4bit",
+    "RedHatAI/Qwen3.6-35B-A3B-FP8"
 ]
