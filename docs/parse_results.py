@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 
 # Config
-BENCHMARK_DIR = Path("../benchmarks/benchmark_results_amd-r9700")
+BENCHMARK_DIR = Path("../benchmarks/vllm_benchmark_results_04-05-2026/triton")
 OUTPUT_FILE = Path("results.json")
 
 # Regex to parse model name for quantization and parameters
@@ -39,7 +39,7 @@ def parse_logs():
     # (Path, variant_tag)
     dirs = [
         (BENCHMARK_DIR, "default"),
-        (Path("../benchmarks/benchmark_results_amd-r9700-rocm_atten"), "rocm")
+        (Path("../benchmarks/vllm_benchmark_results_04-05-2026/rocm"), "rocm")
     ]
     
     for b_dir, variant in dirs:

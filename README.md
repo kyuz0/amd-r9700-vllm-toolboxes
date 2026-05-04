@@ -19,6 +19,11 @@ An **fedora-based** Docker/Podman container that is **Toolbx-compatible** (usabl
 
 ## Tested Models (Benchmarks)
 
+### 🆕 Update (May 4, 2026): ROCm 7.2.1, RCCL Fix & New Models
+A new version of the vLLM toolbox has been pushed, built on **ROCm 7.2.1**. It includes a critical fix that downgrades **RCCL to version 7.1.1**, working around a known breakage in the current ROCm release. With this update, the toolbox now fully supports the newest open-weight models, including the **Qwen 3.6 family** and **Gemma-4**.
+
+I have updated the [core benchmarks](https://kyuz0.github.io/amd-r9700-vllm-toolboxes/) to reflect the performance of these new models on the R9700. Please note that the [NVIDIA comparison benchmarks](https://kyuz0.github.io/amd-r9700-vllm-toolboxes/compare.html) are still based on the older December 2025 model data, as I was unable to rerun them on the NVIDIA hardware.
+
 View full benchmarks at: [https://kyuz0.github.io/amd-r9700-vllm-toolboxes/](https://kyuz0.github.io/amd-r9700-vllm-toolboxes/)
 
 *Run benchmarks now include a comparison between the default Triton backend and the optional ROCm attention backend.*
