@@ -29,49 +29,19 @@ View full benchmarks at: [https://kyuz0.github.io/amd-r9700-vllm-toolboxes/](htt
 *Run benchmarks now include a comparison between the default Triton backend and the optional ROCm attention backend.*
 
 
-**Table Key:** Cell values represent `Max Context Length (GPU Memory Utilization)`.
-
-| Model | TP | 1 Req | 4 Reqs | 8 Reqs | 16 Reqs |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **`meta-llama/Meta-Llama-3.1-8B-Instruct`** | 1 | 127k (0.98) | 127k (0.98) | 127k (0.98) | 127k (0.98) |
-|  | 2 | 105k (0.98) | 105k (0.98) | 105k (0.98) | 105k (0.98) |
-| **`openai/gpt-oss-20b`** | 1 | 131k (0.98) | 131k (0.98) | 131k (0.98) | 131k (0.98) |
-|  | 2 | 131k (0.95) | 131k (0.95) | 131k (0.95) | 131k (0.95) |
-| **`RedHatAI/Qwen3-14B-FP8-dynamic`** | 1 | 41k (0.98) | 41k (0.98) | 41k (0.98) | 41k (0.98) |
-|  | 2 | 41k (0.95) | 41k (0.95) | 41k (0.95) | 41k (0.95) |
-| **`cpatonn/Qwen3-Coder-30B-A3B-Instruct-GPTQ-4bit`** | 1 | 151k (0.98) | 151k (0.98) | 151k (0.98) | 151k (0.98) |
-|  | 2 | 262k (0.98) | 262k (0.98) | 262k (0.98) | 262k (0.98) |
-| **`cpatonn/Qwen3-Next-80B-A3B-Instruct-AWQ-4bit`** | 2 | 156k (0.98) | 156k (0.98) | 156k (0.98) | 156k (0.98) |
-| **`RedHatAI/gemma-3-12b-it-FP8-dynamic`** | 1 | 45k (0.98) | 45k (0.98) | 45k (0.98) | 45k (0.98) |
-|  | 2 | 126k (0.98) | 126k (0.98) | 121k (0.95) | 121k (0.95) |
-| **`RedHatAI/gemma-3-27b-it-FP8-dynamic`** | 2 | 60k (0.98) | 60k (0.98) | 60k (0.98) | 60k (0.98) |
+- `meta-llama/Meta-Llama-3.1-8B-Instruct`
+- `Qwen/Qwen3.5-9B`
+- `cyankiwi/Qwen3.6-27B-AWQ-INT4`
+- `cyankiwi/Qwen3.6-35B-A3B-AWQ-4bit`
+- `cyankiwi/gemma-4-26B-A4B-it-AWQ-4bit`
+- `cyankiwi/gemma-4-31B-it-AWQ-4bit`
+- `RedHatAI/Qwen3.6-35B-A3B-FP8`
 
 ### Advanced Tuning
 
 See [TUNING.md](TUNING.md) for a guide on how to enable undervolting and raise the power limit on AMD R9700 cards on Linux to improve performance and efficiency.
 
-### 🆕 Update: Comparison of Attention Backends (Triton vs ROCm)
 
-*Added Support for ROCm Native Attention Backend*
-
-I have added the ability to switch between the default **Triton** backend and the experimental **ROCm** native backend for attention operations. This provides you with more flexibility to optimize for stability or throughput depending on your specific model and workload.
-
-| Backend | Stability | Throughput | Compatibility |
-| :--- | :--- | :--- | :--- |
-| **Triton** (Default) | ✅ **High** | 🔸 Good | Works with all tested models |
-| **ROCm** | ⚠️ **Experimental** | 🚀 **Highest** | May fail with complex architectures |
-
-**Key Differences:**
-- **Triton**: The safe choice. It uses the Triton compiler to generate kernels and is the standard for vLLM on AMD.
-- **ROCm**: Uses composable kernel based attention. In my benchmarks, this often yields higher throughput (tokens/sec) but can be less stable, leading to crashes or "invalid graph" errors on some newer models.
-
-**How to Use:**
-1. **Easy Mode**: Select the backend in the `start-vllm` wizard (Item 5 in the menu).
-2. **Manual Mode**: Export the following environment variables before running `vllm serve`:
-   ```bash
-   export VLLM_V1_USE_PREFILL_DECODE_ATTENTION=1
-   export VLLM_USE_TRITON_FLASH_ATTN=0
-   ```
 
 
 ---
