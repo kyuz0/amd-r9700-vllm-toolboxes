@@ -1,0 +1,146 @@
+name: build-ubuntu-repoamd
+
+# Manual qualification workflow for the Ubuntu 24.04 / stable AMD multi-arch
+# image. It intentionally never updates `latest`; promotion remains a separate,
+# explicit action after real R9700 TP1/TP2 validation.
+on:
+  workflow_dispatch:
+    inputs:
+      vllm_ref:
+        description: "Upstream vLLM tag/branch/commit (empty = latest stable release)"
+        required: false
+        default: ""
+      image_tag:
+        description: "Qualification image tag"
+        required: true
+        default: "dev-ubuntu"
+
+env:
+  IMAGE_REPO: kyuz0/vllm-therock-gfx1201
+  ROCM_WHL: https://repo.amd.com/rocm/whl-multi-arch/
+  DOCKER_BUILDKIT: "1"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve latest complete stable stack
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          device_list=$(curl -fsSL "${ROCM_WHL}amd-torch-device-gfx1201/")
+          torch_list=$(curl -fsSL "${ROCM_WHL}torch/")
+          torchvision_list=$(curl -fsSL "${ROCM_WHL}torchvision/")
+          torchaudio_list=$(curl -fsSL "${ROCM_WHL}torchaudio/")
+          candidates=$(printf '%s' "$device_list" \
+            | grep -oE 'amd_torch_device_gfx1201-[0-9][0-9.]*\+rocm[0-9.]+-cp312-cp312-linux' \
+            | sed -E 's/^amd_torch_device_gfx1201-//; s/-cp312-cp312-linux$//' \
+            | sort -Vr | uniq)
+
+          torch_version=""
+          rocm_version=""
+          for candidate in $candidates; do
+            candidate_torch="${candidate%%+*}"
+            candidate_rocm="${candidate##*+rocm}"
+            torchvision_minor=$(( $(printf '%s' "$candidate_torch" | cut -d. -f2) + 15 ))
+            torchvision_version="0.${torchvision_minor}.0"
+            printf '%s' "$torch_list" | grep -q "torch-${candidate_torch}+rocm${candidate_rocm}-cp312-cp312-linux" || continue
+            printf '%s' "$torchvision_list" | grep -q "torchvision-${torchvision_version}+rocm${candidate_rocm}-cp312-cp312-linux" || continue
+            printf '%s' "$torchaudio_list" | grep -q "torchaudio-${candidate_torch}+rocm${candidate_rocm}-cp312-cp312-linux" || continue
+            torch_version="$candidate_torch"
+            rocm_version="$candidate_rocm"
+            break
+          done
+
+          vllm_ref="${{ inputs.vllm_ref }}"
+          if [ -z "$vllm_ref" ]; then
+            vllm_ref=$(git ls-remote --tags --refs https://github.com/vllm-project/vllm.git \
+              | awk '{print $2}' | sed 's#refs/tags/##' \
+              | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' \
+              | sort -V | tail -n1)
+          fi
+
+          if [ -z "$torch_version" ] || [ -z "$rocm_version" ] || [ -z "$vllm_ref" ]; then
+            echo "Failed to resolve torch='$torch_version' rocm='$rocm_version' vllm='$vllm_ref'" >&2
+            exit 1
+          fi
+
+          ref_slug=$(printf '%s' "$vllm_ref" | sed 's/[^A-Za-z0-9._-]/-/g' | cut -c1-24)
+          version_tag="rocm${rocm_version}-torch${torch_version}-vllm${ref_slug#v}"
+          echo "torch_version=${torch_version}" >> "$GITHUB_OUTPUT"
+          echo "rocm_version=${rocm_version}" >> "$GITHUB_OUTPUT"
+          echo "vllm_ref=${vllm_ref}" >> "$GITHUB_OUTPUT"
+          echo "version_tag=${version_tag}" >> "$GITHUB_OUTPUT"
+          echo "Resolved ${version_tag}; publishing qualification tag ${{ inputs.image_tag }}"
+
+      - name: Put Docker on /mnt
+        run: |
+          set -eux
+          echo '{ "data-root": "/mnt/docker" }' | sudo tee /etc/docker/daemon.json
+          sudo systemctl stop docker
+          sudo rm -rf /var/lib/docker
+          sudo mkdir -p /mnt/docker
+          sudo systemctl start docker
+          docker info | grep "Docker Root Dir"
+
+      - name: Free disk space
+        shell: bash
+        run: |
+          set -euxo pipefail
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache
+          docker system prune -af
+          docker builder prune -af
+          sudo apt-get clean
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: docker.io/${{ env.IMAGE_REPO }}
+          tags: |
+            type=raw,value=${{ inputs.image_tag }}
+            type=raw,value=${{ steps.version.outputs.version_tag }}
+            type=sha
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ steps.version.outputs.version_tag }}
+
+      - name: Build and push qualification image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.ubuntu-repoamd
+          platforms: linux/amd64
+          push: true
+          pull: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            ROCM_WHL=${{ env.ROCM_WHL }}
+            TORCH_VERSION=${{ steps.version.outputs.torch_version }}
+            ROCM_VERSION=${{ steps.version.outputs.rocm_version }}
+            VLLM_REF=${{ steps.version.outputs.vllm_ref }}
+          provenance: false
+          sbom: false
+          cache-from: type=registry,ref=docker.io/${{ env.IMAGE_REPO }}:buildcache-ubuntu-repoamd
+          cache-to: type=registry,ref=docker.io/${{ env.IMAGE_REPO }}:buildcache-ubuntu-repoamd,mode=max,image-manifest=true,oci-mediatypes=true
+
+      - name: Prune buildx cache
+        if: always()
+        run: docker buildx prune -af --verbose --min-free-space 4gb || true

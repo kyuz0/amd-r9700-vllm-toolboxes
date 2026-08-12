@@ -1,6 +1,6 @@
 # AMD Radeon R9700 AI PRO (gfx1201) — vLLM Toolbox
 
-A Fedora-based, Toolbx-compatible container for serving LLMs with vLLM on AMD Radeon R9700 (gfx1201) GPUs.
+A Toolbx-compatible container for serving LLMs with vLLM on AMD Radeon R9700 (gfx1201) GPUs.
 
 ![Demo](demo.gif)
 
@@ -36,7 +36,7 @@ Create a toolbox container with direct GPU access and relaxed security filters:
 ```bash
 toolbox create vllm-r9700 \
   --image docker.io/kyuz0/vllm-therock-gfx1201:latest \
-  -- --device /dev/dri --device /dev/kfd \
+  -- --device /dev/dri --device /dev/kfd --ipc=host \
   --group-add video --group-add render --security-opt seccomp=unconfined
 ```
 
@@ -63,7 +63,7 @@ For Ubuntu hosts, use Distrobox to set up the container:
 ```bash
 distrobox create -n vllm-r9700 \
   --image docker.io/kyuz0/vllm-therock-gfx1201:latest \
-  --additional-flags "--device /dev/kfd --device /dev/dri --group-add video --group-add render --security-opt seccomp=unconfined"
+  --additional-flags "--device /dev/kfd --device /dev/dri --ipc=host --group-add video --group-add render --security-opt seccomp=unconfined"
 
 distrobox enter vllm-r9700
 ```
@@ -123,7 +123,7 @@ docker run -p 3000:3000 \
 
 ## Keeping the Toolbox Up-to-Date
 
-The `vllm-therock-gfx1201` image tracks AMD ROCm nightly builds. To recreate the toolbox without losing downloaded model weights, use the `refresh-toolbox.sh` script:
+The `vllm-therock-gfx1201` image provides `latest` and `dev` channels. To recreate the toolbox without losing downloaded model weights, use the `refresh-toolbox.sh` script:
 
 ```bash
 # Download the refresh script
@@ -132,12 +132,15 @@ chmod +x refresh-toolbox.sh
 
 # Run script to pull updates and recreate the container
 ./refresh-toolbox.sh
+
+# Or install the qualification build from the dev channel
+./refresh-toolbox.sh dev
 ```
 
 The script automatically:
 * Detects the container engine (Docker or Podman).
 * Removes the existing container while preserving the volume mounts and user cache.
-* Recreates the container with the correct GPU devices (`/dev/dri`, `/dev/kfd`), group permissions (`video`, `render`), and seccomp profile (`unconfined`).
+* Recreates the container with the correct GPU devices (`/dev/dri`, `/dev/kfd`), host IPC for multi-GPU shared memory, group permissions (`video`, `render`), and seccomp profile (`unconfined`).
 * Prunes orphaned image layers to free disk space.
 
 ---

@@ -2,6 +2,7 @@
 import sys
 import os
 import json
+import re
 import time
 import shutil
 import tempfile
@@ -36,58 +37,57 @@ else:
 HOST = os.getenv("HOST", "0.0.0.0")
 PORT = os.getenv("PORT", "8000")
 
+def get_r9700_indices():
+    """Return the ROCm indices of all R9700/gfx1201 GPUs."""
+    try:
+        res = subprocess.run(
+            ["rocm-smi", "--showproductname"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        )
+        if res.returncode != 0:
+            return []
+
+        indices = set()
+        for line in res.stdout.splitlines():
+            match = re.search(r"GPU\[(\d+)\]", line)
+            if match and (
+                "gfx1201" in line.lower()
+                or "AMD Radeon AI PRO R9700" in line
+            ):
+                indices.add(int(match.group(1)))
+        return sorted(indices)
+    except (OSError, subprocess.SubprocessError):
+        return []
+
+
 def find_r9700():
-    """Finds ALL gfx1201 GPUs and sets HIP_VISIBLE_DEVICES.
+    """Find all R9700 GPUs and set HIP_VISIBLE_DEVICES.
     
     CRITICAL: Do NOT set CUDA_VISIBLE_DEVICES or ROCR_VISIBLE_DEVICES.
     Those conflict with HIP_VISIBLE_DEVICES and break RCCL initialization,
     causing vLLM to hang at distributed init.
     """
-    gfx1201_indices = []
-    try:    
-        res = subprocess.run(
-            ["rocm-smi", "--showproductname"],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
-        )
-        current_gpu = None
-        for line in res.stdout.split("\n"):
-            if "GPU[" in line and "]" in line:
-                current_gpu = line.split("]")[0].split("[")[1].strip()
-            if current_gpu and "gfx1201" in line.lower():
-                if current_gpu not in gfx1201_indices:
-                    gfx1201_indices.append(current_gpu)
-                current_gpu = None  # Reset so we don't double-count
-    except Exception:
-        pass
-    
-    if gfx1201_indices:
-        visible = ",".join(gfx1201_indices)
+    r9700_indices = get_r9700_indices()
+    if r9700_indices:
+        visible = ",".join(str(index) for index in r9700_indices)
         os.environ["HIP_VISIBLE_DEVICES"] = visible
-        print(f"[*] Found {len(gfx1201_indices)} R9700(s) → HIP_VISIBLE_DEVICES={visible}")
+        print(f"[*] Found {len(r9700_indices)} R9700(s) → HIP_VISIBLE_DEVICES={visible}")
     else:
         print("[!] Could not detect R9700 via rocm-smi, defaulting to HIP_VISIBLE_DEVICES=0")
         os.environ["HIP_VISIBLE_DEVICES"] = "0"
 
 
 def detect_gpus():
-    """Detects AMD GPUs via rocm-smi or /dev/dri."""
-    try:
-        # Try rocm-smi first
-        res = subprocess.run(["rocm-smi", "--showid"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        if res.returncode == 0:
-            target_gpu = "AMD Radeon Graphics"
-            count = 0
-            for line in res.stdout.strip().split('\n'):
-                if "Device Name" in line and target_gpu in line:
-                    count += 1
-            if count > 0: return count
-    except: pass
-    
-    # Fallback to /dev/dri/render*
-    try:
-        return len(list(Path("/dev/dri").glob("renderD*")))
-    except:
-        return 1
+    """Return the number of R9700s available to the launcher."""
+    r9700_indices = get_r9700_indices()
+    if r9700_indices:
+        return len(r9700_indices)
+
+    visible = os.getenv("HIP_VISIBLE_DEVICES", "")
+    if visible:
+        return len([index for index in visible.split(",") if index.strip()])
+
+    return 1
 
 def get_discovered_models():
     """

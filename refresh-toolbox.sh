@@ -45,7 +45,7 @@ if [ "$CHANNEL" = "dev" ]; then
 fi
 
 # Base options
-OPTIONS="--device /dev/dri --device /dev/kfd --group-add video --group-add render --security-opt seccomp=unconfined"
+OPTIONS="--device /dev/dri --device /dev/kfd --ipc=host --group-add video --group-add render --security-opt seccomp=unconfined"
 
 # Check for InfiniBand devices
 if [ -d "/dev/infiniband" ]; then
