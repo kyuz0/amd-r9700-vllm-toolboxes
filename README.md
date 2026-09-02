@@ -2,36 +2,54 @@
 
 A Toolbx-compatible container for serving LLMs with vLLM on AMD Radeon R9700 (gfx1201) GPUs.
 
+## Recommended setup: AI Toolbox Cockpit
+
+[AI Toolbox Cockpit](https://github.com/kyuz0/ai-toolbox-cockpit) is the preferred way to install, launch, and update this container. It provides tested, pre-configured profiles; supports Toolbx and Distrobox; and can run vLLM directly with Podman or Docker, so Toolbx is not required.
+
+```bash
+pipx install git+https://github.com/kyuz0/ai-toolbox-cockpit.git
+ai-toolbox-cockpit
+```
+
+The repository's [`refresh-toolbox.sh`](refresh-toolbox.sh) remains available for manual Toolbx refreshes. The Cockpit is recommended for normal installation and updates.
+
+## Available image channels
+
+| Image | Purpose |
+| :--- | :--- |
+| `docker.io/kyuz0/vllm-therock-gfx1201:latest` | Verified build recommended for most users. |
+| `docker.io/kyuz0/vllm-therock-gfx1201:dev` | Qualification build with newer changes; may be less stable. |
+
 ![Demo](demo.gif)
 
 ---
 
 ## Table of Contents
 
-* [Toolbx vs Docker/Podman](#toolbx-vs-dockerpodman)
-* [Quickstart — Fedora Toolbx](#quickstart--fedora-toolbx)
-* [Quickstart — Ubuntu (Distrobox)](#quickstart--ubuntu-distrobox)
+* [Container options](#container-options)
+* [Manual Toolbx setup](#manual-toolbx-setup)
+* [Manual Distrobox setup](#manual-distrobox-setup)
 * [Testing the API](#testing-the-api)
 * [Web UI Integration](#web-ui-integration)
-* [Keeping the Toolbox Up-to-Date](#keeping-the-toolbox-up-to-date)
+* [Manual updates](#manual-updates)
 * [AITER Unified Attention Integration](#aiter-unified-attention-integration)
 * [Benchmarks & Tested Models](#benchmarks--tested-models)
 * [Advanced Tuning](#advanced-tuning)
 
 ---
 
-## Toolbx vs Docker/Podman
+## Container options
 
-The `kyuz0/vllm-therock-gfx1201:latest` image can be used in two modes:
+AI Toolbox Cockpit handles the recommended setup for each mode. The image can also be managed manually as:
 
 * **Fedora Toolbx (development):** Shares the host's `HOME` directory and user environment. Best for local development and rapid iterations.
 * **Docker/Podman (deployment/performance):** Recommended for serving as a background service. Always mount a host directory for caching model weights.
 
 ---
 
-## Quickstart — Fedora Toolbx
+## Manual Toolbx setup
 
-Create a toolbox container with direct GPU access and relaxed security filters:
+Use this section only if you prefer to manage the Toolbx container yourself. Create it with direct GPU access and relaxed security filters:
 
 ```bash
 toolbox create vllm-r9700 \
@@ -56,7 +74,7 @@ start-vllm
 
 ---
 
-## Quickstart — Ubuntu (Distrobox)
+## Manual Distrobox setup
 
 For Ubuntu hosts, use Distrobox to set up the container:
 
@@ -121,16 +139,12 @@ docker run -p 3000:3000 \
 
 ---
 
-## Keeping the Toolbox Up-to-Date
+## Manual updates
 
-The `vllm-therock-gfx1201` image provides `latest` and `dev` channels. To recreate the toolbox without losing downloaded model weights, use the `refresh-toolbox.sh` script:
+AI Toolbox Cockpit is the recommended update path. If you created the Toolbx container manually, `refresh-toolbox.sh` can recreate it without losing downloaded model weights. The image provides `latest` and `dev` channels:
 
 ```bash
-# Download the refresh script
-curl -O https://raw.githubusercontent.com/kyuz0/amd-r9700-vllm-toolboxes/main/refresh-toolbox.sh
-chmod +x refresh-toolbox.sh
-
-# Run script to pull updates and recreate the container
+# Pull updates and recreate the container
 ./refresh-toolbox.sh
 
 # Or install the qualification build from the dev channel
