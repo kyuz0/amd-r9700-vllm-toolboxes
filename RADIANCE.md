@@ -6,6 +6,8 @@ The manual `build-radiance` workflow resolves an upstream stable release when av
 
 To build locally on the GPU host with Podman and Git, run `python3 scripts/build_radiance.py`. Compilation runs inside containers, with two jobs and a 24 GiB limit by default. The command builds the rolling tag locally without publishing it.
 
+The publication workflow uses a prepared Linux runner selected by its `runner_label` input (default `r9700-radiance-builder`), with Podman, Git, Python 3, at least 32 GiB RAM and 80 GiB free disk. It builds with two workers and a 24 GiB memory limit. Existing Podman build layers are reusable. For a single-use runner, register it with `--ephemeral --no-default-labels --labels r9700-radiance-builder`; the runner deregisters after its job. No host package installation or system service is performed by the workflow. Registry authentication uses a temporary job file and is removed after publication.
+
 ## Models
 
 Use Cockpit's vLLM Models panel to download the exact catalogue artifact for **Qwen3.8 27B native FP8** or **Qwen3.8 27B MXFP4 + FP8 MTP**. For MXFP4, run Prepare to create a separate converted checkpoint, then select its directory in Server Mode. The image includes the GGZ14 checkpoint converter and records its source and hash separately from Radiance's engine identity.

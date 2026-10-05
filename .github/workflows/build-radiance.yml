@@ -1,6 +1,12 @@
 name: Build and publish radiance R9700 channels
 on:
   workflow_dispatch:
+    inputs:
+      runner_label:
+        description: Label of a prepared Linux source-build runner (32 GiB RAM or more)
+        type: string
+        default: r9700-radiance-builder
+        required: true
 permissions:
   contents: read
 concurrency:
@@ -8,40 +14,52 @@ concurrency:
   cancel-in-progress: false
 jobs:
   build:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 360
+    runs-on: ${{ inputs.runner_label }}
+    timeout-minutes: 1440
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Prepare ephemeral runner
-        run: |
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/hostedtoolcache
-          sudo apt-get update
-          sudo apt-get install -y podman skopeo
-          df -h /
-          free -h
-      - name: Build current upstream channel
-        run: sudo python3 scripts/build_radiance.py --workspace research/radiance-build --jobs 1 --memory 14g
-      - name: Verify CPU entry points
-        run: |
-          sudo podman run --rm --network=none docker.io/kyuz0/amd-r9700-vllm-toolboxes:radiance /opt/vllm/bin/python -c 'import vllm; print(vllm.__version__)'
-      - uses: docker/login-action@v3
-        with:
-          registry: docker.io
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Publish rolling channels
-        env:
-          REGISTRY_AUTH_FILE: /home/runner/.docker/config.json
+      - name: Check source-build resources
         run: |
           set -euo pipefail
-          for channel in radiance; do
-            image="docker.io/kyuz0/amd-r9700-vllm-toolboxes:$channel"
-            sudo --preserve-env=REGISTRY_AUTH_FILE podman push "$image"
-            echo "Published $image" >> "$GITHUB_STEP_SUMMARY"
-          done
+          for executable in python3 git podman; do command -v "$executable"; done
+          df -h .
+          free -h
+          python3 - <<'PY'
+          import shutil
+          from pathlib import Path
+          memory = dict(line.split(':', 1) for line in Path('/proc/meminfo').read_text().splitlines())
+          assert int(memory['MemAvailable'].split()[0]) >= 28 * 1024 * 1024, 'At least 28 GiB available RAM is required'
+          assert shutil.disk_usage('.').free >= 80 * 1024**3, 'At least 80 GiB free disk is required'
+          PY
+      - name: Build current upstream channel
+        run: |
+          set -euo pipefail
+          python3 -u scripts/build_radiance.py --workspace research/radiance-build --jobs 2 --memory 24g 2>&1 | tee "$RUNNER_TEMP/radiance-build.log"
+      - name: Verify CPU entry points
+        run: |
+          podman run --rm --network=none docker.io/kyuz0/amd-r9700-vllm-toolboxes:radiance /opt/vllm/bin/python -c 'import vllm; print(vllm.__version__)'
+      - name: Publish rolling channel
+        env:
+          REGISTRY_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          auth_file="$RUNNER_TEMP/radiance-registry-auth.json"
+          printf '%s' "$REGISTRY_PASSWORD" | podman login --authfile "$auth_file" --username "$REGISTRY_USERNAME" --password-stdin docker.io
+          image="docker.io/kyuz0/amd-r9700-vllm-toolboxes:radiance"
+          podman push --authfile "$auth_file" "$image"
+          echo "Published $image" >> "$GITHUB_STEP_SUMMARY"
           cat research/radiance-build/BUILD-IDENTITY.json >> "$GITHUB_STEP_SUMMARY"
+      - name: Remove temporary registry authentication
+        if: always()
+        run: |
+          auth_file="$RUNNER_TEMP/radiance-registry-auth.json"
+          if test -f "$auth_file"; then
+            podman logout --authfile "$auth_file" docker.io || true
+            rm -f -- "$auth_file"
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
