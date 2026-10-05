@@ -1,0 +1,53 @@
+name: Build and publish ggz14 R9700 channels
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: publish-ggz14-r9700
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Prepare ephemeral runner
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/hostedtoolcache
+          sudo apt-get update
+          sudo apt-get install -y podman skopeo
+          df -h /
+          free -h
+      - name: Build current upstream channel
+        run: python3 scripts/build_ggz14.py --workspace research/ggz14-build --jobs 1 --memory 14g
+      - name: Verify CPU entry points
+        run: |
+          podman run --rm --network=none docker.io/kyuz0/amd-r9700-vllm-toolboxes:ggz14-tp1 /opt/vllm/bin/python -c 'import vllm; print(vllm.__version__)'
+          podman run --rm --network=none docker.io/kyuz0/amd-r9700-vllm-toolboxes:ggz14-tp2 /opt/vllm/bin/python -c 'import vllm; print(vllm.__version__)'
+      - uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Publish rolling channels
+        env:
+          REGISTRY_AUTH_FILE: /home/runner/.docker/config.json
+        run: |
+          set -euo pipefail
+          for channel in ggz14-tp1 ggz14-tp2; do
+            image="docker.io/kyuz0/amd-r9700-vllm-toolboxes:$channel"
+            podman push "$image"
+            echo "Published $image" >> "$GITHUB_STEP_SUMMARY"
+          done
+          cat research/ggz14-build/BUILD-IDENTITY.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ggz14-build-provenance
+          path: |
+            research/ggz14-build/*IDENTITY.json
+            research/ggz14-build/BASE-NORMALIZATION.json
+            research/ggz14-build/Dockerfile.engine
