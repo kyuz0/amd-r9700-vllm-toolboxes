@@ -13,6 +13,9 @@ ai-toolbox-cockpit
 
 The repository's [`refresh-toolbox.sh`](refresh-toolbox.sh) remains available for manual Toolbx refreshes. The Cockpit is recommended for normal installation and updates.
 
+The optional [GGZ14 MXFP4 toolbox](GGZ14.md) provides rolling public one-card/two-card channels and Cockpit presets.
+The separate [Radiance toolbox](RADIANCE.md) provides rolling public FP8 and MXFP4 profiles for two R9700 cards.
+
 ## Available image channels
 
 | Image | Purpose |

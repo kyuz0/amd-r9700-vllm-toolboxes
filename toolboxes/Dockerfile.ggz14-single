@@ -1,0 +1,15 @@
+# Single-card RX9 overlay from the selected GGZ14 release.
+ARG ENGINE_IMAGE=localhost/r9700-ggz14:build
+ARG BASE_IMAGE=localhost/r9700-radiance-base:build
+FROM ${BASE_IMAGE} AS r4d_single
+ARG R4D_REF
+COPY r4d_radiance_extras_rx9.patch /tmp/r4d_radiance_extras_rx9.patch
+RUN test -n "$R4D_REF" \
+    && apt-get update && apt-get install -y --no-install-recommends git \
+    && git clone https://codeberg.org/StillDeadcode/libr4d.git /src/libr4d \
+    && git -C /src/libr4d checkout --detach "$R4D_REF" \
+    && git -C /src/libr4d apply /tmp/r4d_radiance_extras_rx9.patch \
+    && cd /src/libr4d && GFX_ARCH=gfx1201 ./build.sh
+FROM ${ENGINE_IMAGE}
+COPY --from=r4d_single /src/libr4d/r4d.so /opt/vllm/lib/python3.12/site-packages/r4d.so
+LABEL io.kyuz0.ggz14.kernel-profile="single-rx9"

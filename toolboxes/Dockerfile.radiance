@@ -1,0 +1,21 @@
+ARG ENGINE_IMAGE=localhost/r9700-radiance:build
+FROM ${ENGINE_IMAGE}
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends sudo passwd util-linux libcap2-bin locales less iproute2 iputils-ping \
+    && rm -rf /var/lib/apt/lists/* && locale-gen en_US.UTF-8 \
+    && if getent passwd ubuntu >/dev/null; then userdel --remove ubuntu; fi \
+    && ln -sf /opt/vllm/bin/vllm /usr/local/bin/vllm \
+    && printf 'export PATH=/opt/vllm/bin:/opt/rocm/bin:$PATH\n' > /etc/profile.d/radiance.sh
+COPY fp8_mtp.py /opt/ggz14/fp8_mtp.py
+RUN sha256sum /opt/ggz14/fp8_mtp.py > /opt/ggz14/converter.sha256
+ENV LANG=en_US.UTF-8 RADIANCE_RUN_BWTEST=0 VLLM_NO_USAGE_STATS=1
+ARG SOURCE_REVISION
+ARG SOURCE_VERSION
+LABEL com.github.containers.toolbox="true" \
+    org.opencontainers.image.source="https://github.com/magiccodingman/vllm-radiance" \
+    org.opencontainers.image.revision="${SOURCE_REVISION}" \
+    org.opencontainers.image.version="${SOURCE_VERSION}" \
+    org.opencontainers.image.title="Radiance gfx1201 R9700 toolbox"
+WORKDIR /opt
+ENTRYPOINT []
+CMD ["/bin/bash"]

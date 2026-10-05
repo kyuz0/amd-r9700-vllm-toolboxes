@@ -1,0 +1,24 @@
+ARG ENGINE_IMAGE=localhost/r9700-ggz14:build
+FROM ${ENGINE_IMAGE}
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    sudo passwd util-linux libcap2-bin locales less iproute2 iputils-ping \
+    && rm -rf /var/lib/apt/lists/* \
+    && locale-gen en_US.UTF-8
+RUN if getent passwd ubuntu >/dev/null; then userdel --remove ubuntu; fi
+COPY fp8_mtp.py /opt/ggz14/fp8_mtp.py
+RUN sha256sum /opt/ggz14/fp8_mtp.py > /opt/ggz14/converter.sha256 \
+    && ln -sf /opt/vllm/bin/vllm /usr/local/bin/vllm \
+    && printf 'export PATH=/opt/vllm/bin:/opt/rocm/bin:$PATH\n' > /etc/profile.d/ggz14.sh
+ENV LANG=en_US.UTF-8 RADIANCE_RUN_BWTEST=0 VLLM_NO_USAGE_STATS=1
+ARG SOURCE_REVISION
+ARG SOURCE_VERSION
+LABEL com.github.containers.toolbox="true" \
+    org.opencontainers.image.source="https://github.com/GGZ14/vllm-mxfp4" \
+    org.opencontainers.image.revision="${SOURCE_REVISION}" \
+    org.opencontainers.image.version="${SOURCE_VERSION}" \
+    org.opencontainers.image.title="GGZ14 MXFP4 R9700 toolbox" \
+    org.opencontainers.image.description="gfx1201 vLLM/MXFP4 engine with CPU checkpoint preparation"
+WORKDIR /opt
+ENTRYPOINT []
+CMD ["/bin/bash"]
