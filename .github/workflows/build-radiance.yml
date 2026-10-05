@@ -7,6 +7,10 @@ on:
         type: string
         default: r9700-radiance-builder
         required: true
+      existing_image:
+        description: Optional tested local Radiance image to package and publish without recompiling
+        type: string
+        default: ""
 permissions:
   contents: read
 concurrency:
@@ -21,6 +25,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Check source-build resources
+        if: inputs.existing_image == ''
         run: |
           set -euo pipefail
           for executable in python3 git podman; do command -v "$executable"; done
@@ -34,9 +39,17 @@ jobs:
           assert shutil.disk_usage('.').free >= 80 * 1024**3, 'At least 80 GiB free disk is required'
           PY
       - name: Build current upstream channel
+        if: inputs.existing_image == ''
         run: |
           set -euo pipefail
           python3 -u scripts/build_radiance.py --workspace research/radiance-build --jobs 2 --memory 24g 2>&1 | tee "$RUNNER_TEMP/radiance-build.log"
+      - name: Package tested local runtime
+        if: inputs.existing_image != ''
+        env:
+          EXISTING_IMAGE: ${{ inputs.existing_image }}
+        run: |
+          set -euo pipefail
+          python3 -u scripts/package_radiance.py --image "$EXISTING_IMAGE" --workspace research/radiance-build 2>&1 | tee "$RUNNER_TEMP/radiance-build.log"
       - name: Verify CPU entry points
         run: |
           podman run --rm --network=none docker.io/kyuz0/amd-r9700-vllm-toolboxes:radiance /opt/vllm/bin/python -c 'import vllm; print(vllm.__version__)'
